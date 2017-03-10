@@ -66,7 +66,6 @@ public class StockListener implements Observer {
 			int finestraTemporale, Observable player, List<Metodo> metodi) {
 		super();
 		this.codAlfa = codalfa;
-//		Qeuro = qeuro;
 		this.finestraTemporale = finestraTemporale;
 		this.player = player;
 		this.metodi = metodi;
@@ -89,12 +88,7 @@ public class StockListener implements Observer {
 		if (tick.volume<=0) return;
 		
 		this.tick = tick;
-		float price = Float.parseFloat(tick.price);
-//		int Q = Math.round(Qeuro/price);
-		
-//		GestioneOrdini gi = GestioneOrdini.getInstance();
-	
-		
+		float price = Float.parseFloat(tick.price);	
 		
 		db.insertTick(tick);
 		
@@ -103,10 +97,7 @@ public class StockListener implements Observer {
 		
 		ora = now.get(Calendar.HOUR_OF_DAY);
 		minuto = now.get(Calendar.MINUTE);
-		
-//		//frequenza degli scambi
-//		int eseguititotali=0;
-//		eseguititotali++;   //ogni tick processato aggiorno il numero degli eseguiti
+
 		
 		//aggiorniamo il vwap
 		vwap = (vwap*volumeTotale + ((float)price*tick.volume))/(volumeTotale+tick.volume);
@@ -119,13 +110,7 @@ public class StockListener implements Observer {
 
 		totalTurnover+=(float)price*tick.volume;
 		
-//		//calcolo varianza
-//		somma = 0;
-//		for (int i=-1;i<=1;i++) {
-//			for (int j=-1;j<=1;j++) {
-//				somma += Math.pow(risultatiQS.get(Q+i).get(S+j)-media, 2);
-//			}
-//		}
+
 		System.out.println("lastAsk: "+lastAsk);
 		System.out.println("lastBid: "+lastBid);
 		
@@ -134,8 +119,14 @@ public class StockListener implements Observer {
 			System.out.println((lastAsk-lastBid));
 			lastSpread=Math.round(((lastAsk-lastBid)/GestioneOrdini.tickSizeFromPriceFloat(lastAsk)));
 			System.out.println(lastSpread);
-			ImpactBuy=Math.round(Math.abs(((price-lastAsk)/GestioneOrdini.tickSizeFromPriceFloat(lastAsk))+1));
-			ImpactSell=Math.round(Math.abs(((lastBid-price)/GestioneOrdini.tickSizeFromPriceFloat(lastAsk))+1));}
+			ImpactBuy=Math.abs(Math.round((price-lastAsk)/GestioneOrdini.tickSizeFromPriceFloat(lastAsk)))+1;
+			ImpactSell=Math.abs(Math.round((lastBid-price)/GestioneOrdini.tickSizeFromPriceFloat(lastAsk)))+1;
+			System.out.println("price : "+price);
+			System.out.println("Math.round: "+Math.round((price-lastAsk)/GestioneOrdini.tickSizeFromPriceFloat(lastAsk)));
+			System.out.println("Math.Abs: "+Math.abs(Math.round((price-lastAsk)/GestioneOrdini.tickSizeFromPriceFloat(lastAsk))));
+			System.out.println("ImpactBuy: "+ImpactBuy);
+			System.out.println("ImpactSell: "+ImpactSell);
+		}
 		else {
 			lastSpread=1;
 			ImpactBuy=1;
@@ -145,62 +136,47 @@ public class StockListener implements Observer {
 		trades.add(new trade(tick.timestamp.getTime(),tick.timestamp,price,vwap,(int) (tick.buy ? (float)price*tick.volume : -(float)price*tick.volume),lastSpread,(int) (tick.buy ? ImpactBuy : ImpactSell)));
 
 		
+		for (trade t : trades)
+		    System.out.println(t.timestamp+" prezzo: "+t.price+" vwap: "+t.vwap+" controvalore: "+t.val+"€ spread: "+t.spread+" Impatto: "+t.impact);
 		
 		
-		try {
+		calcolaIndicatori();
+}
 
-			File file = new File(codAlfa+".tmp");
-			FileOutputStream fop = new FileOutputStream(file);
-
-			// if file doesnt exists, then create it
-			if (!file.exists()) {
-				file.createNewFile();}
-			
-			ObjectOutputStream oos = new ObjectOutputStream(fop);
-			oos.writeObject(trades);
-			oos.close();}
-			
-		catch (IOException e) {
-		
-			e.printStackTrace();
-		}	
-	
 		
 		
+//		try {
+//
+//			File file = new File(codAlfa+".tmp");
+//			FileOutputStream fop = new FileOutputStream(file);
+//
+//			// if file doesnt exists, then create it
+//			if (!file.exists()) {
+//				file.createNewFile();}
+//			
+//			ObjectOutputStream oos = new ObjectOutputStream(fop);
+//			oos.writeObject(trades);
+//			oos.close();}
+//			
+//		catch (IOException e) {
+//		
+//			e.printStackTrace();
+//		}	
+//	
 		
-			long tempoIniziale = tick.timestamp.getTime() - 1000 * 60 * finestraTemporale; //30 minuti
-//			long finestraStdDev = tick.timestamp.getTime() - 1000 * 60 * 5; //5 minuti
-			int qTotaleTrades = 0, qCompratoTrades = 0;
-			numberoftrades = 0;
-			double sommaScarti=0;
-			int sommaSpread=0;
-			int sommaBookImpact=0;
-			for (int k=0;k<trades.size();k++) {
-				sommaScarti+=Math.pow(trades.get(k).price-trades.get(k).vwap, 2);
-//				System.out.println("price: " +trades.get(k).vwap);
-//				System.out.println("vwap: " +vwap);
-				sommaSpread+=trades.get(k).spread;
-//				System.out.println("lastAsk: "+lastAsk);
-//				System.out.println("lastBid: "+lastBid);
-//				System.out.println("spread: " +trades.get(k).spread);
-				sommaBookImpact+=trades.get(k).impact*Math.abs(trades.get(k).val);
-//				System.out.println("impact: " +trades.get(k).impact);
-//				System.out.println("timestamp trade: "+trades.get(k).timestamp);
-//				System.out.println("tempo inizialie: "+tempoIniziale);
-//				System.out.println("è negoziazione continua?: "+eNegoziazioneContinua(tick.timestamp));
-				if ((trades.get(k).timestampLong >= tempoIniziale ) && (eNegoziazioneContinua(trades.get(k).timestamp))){
-					numberoftrades++;
-					int val = trades.get(k).val;
-					if (val>0) {
-						qTotaleTrades+=val;
-						qCompratoTrades+=val;
-					} else {
-						qTotaleTrades+=-val;
-					}
-				}
-			}
+		
+		
+//			long tempoIniziale = tick.timestamp.getTime() - 1000 * 60 * finestraTemporale; //30 minuti
+//			int qTotaleTrades = 0, qCompratoTrades = 0;
+//			numberoftrades = 0;
+//			double sommaScarti=0;
+//			int sommaSpread=0;
+//			int sommaBookImpact=0;
 //			for (int k=0;k<trades.size();k++) {
-//				if ((trades.get(k).timestamp > tempoIniziale ) && (eNegoziazioneContinua(tick.timestamp))){
+//				sommaScarti+=Math.pow(trades.get(k).price-trades.get(k).vwap, 2);
+//				sommaSpread+=trades.get(k).spread;
+//				sommaBookImpact+=trades.get(k).impact*Math.abs(trades.get(k).val);
+//				if ((trades.get(k).timestampLong >= tempoIniziale ) && (eNegoziazioneContinua(trades.get(k).timestamp))){
 //					numberoftrades++;
 //					int val = trades.get(k).val;
 //					if (val>0) {
@@ -211,49 +187,74 @@ public class StockListener implements Observer {
 //					}
 //				}
 //			}
-			
-			turnover = qTotaleTrades;
-			marketorderdelta = qCompratoTrades-(qTotaleTrades-qCompratoTrades);	
-			try {
-			averageturnover = (int) qTotaleTrades/numberoftrades;
-			marketbuypercentage = (float)qCompratoTrades/qTotaleTrades;}
-			catch (Exception e) {
-				System.out.println("eccezione!");
-				System.out.println("numberoftrades: "+numberoftrades);
-				System.out.println("qTotaleTrades: "+qTotaleTrades);
-				e.printStackTrace();}
-			try {
-				standardDeviation = Math.sqrt(sommaScarti/(trades.size()-1));
-				bidAskSpread = (float) sommaSpread/trades.size();
-				bookImpact = (float) sommaBookImpact/totalTurnover;}
-			catch (Exception exc){
-				System.out.println("eccezione!");
-				System.out.println("trades.size(): "+trades.size());
-				exc.printStackTrace();}
-			
-			
-			for (trade t : trades)
-			    System.out.println(t.timestamp+" prezzo: "+t.price+" vwap: "+t.vwap+" controvalore: "+t.val+"€ spread: "+t.spread+" Impatto: "+t.impact);
+//
+//			
+//			turnover = qTotaleTrades;
+//			marketorderdelta = qCompratoTrades-(qTotaleTrades-qCompratoTrades);	
+//			try {
+//			averageturnover = (int) qTotaleTrades/numberoftrades;
+//			marketbuypercentage = (float)qCompratoTrades/qTotaleTrades;}
+//			catch (Exception e) {
+//				System.out.println("eccezione!");
+//				System.out.println("numberoftrades: "+numberoftrades);
+//				System.out.println("qTotaleTrades: "+qTotaleTrades);
+//				e.printStackTrace();}
+//			try {
+//				standardDeviation = Math.sqrt(sommaScarti/(trades.size()-1));
+//				bidAskSpread = (float) sommaSpread/trades.size();
+//				bookImpact = (float) sommaBookImpact/totalTurnover;}
+//			catch (Exception exc){
+//				System.out.println("eccezione!");
+//				System.out.println("trades.size(): "+trades.size());
+//				exc.printStackTrace();}
+//			
+
+
+	public void calcolaIndicatori () {
+	
+		long tempoIniziale = tick.timestamp.getTime() - 1000 * 60 * finestraTemporale; //30 minuti
+		int qTotaleTrades = 0, qCompratoTrades = 0;
+		numberoftrades = 0;
+		double sommaScarti=0;
+		int sommaSpread=0;
+		int sommaBookImpact=0;
+		for (int k=0;k<trades.size();k++) {
+			sommaScarti+=Math.pow(trades.get(k).price-trades.get(k).vwap, 2);
+			sommaSpread+=trades.get(k).spread;
+			sommaBookImpact+=trades.get(k).impact*Math.abs(trades.get(k).val);
+			if ((trades.get(k).timestampLong >= tempoIniziale ) && (eNegoziazioneContinua(trades.get(k).timestamp))){
+				numberoftrades++;
+				int val = trades.get(k).val;
+				if (val>0) {
+					qTotaleTrades+=val;
+					qCompratoTrades+=val;
+				} else {
+					qTotaleTrades+=-val;
+				}
+			}
+		}
+		
+		
+		turnover = qTotaleTrades;
+		marketorderdelta = qCompratoTrades-(qTotaleTrades-qCompratoTrades);	
+		try {
+		averageturnover = (int) qTotaleTrades/numberoftrades;
+		marketbuypercentage = (float)qCompratoTrades/qTotaleTrades;}
+		catch (Exception e) {
+			System.out.println("eccezione!");
+			System.out.println("numberoftrades: "+numberoftrades);
+			System.out.println("qTotaleTrades: "+qTotaleTrades);
+			e.printStackTrace();}
+		try {
+			standardDeviation = Math.sqrt(sommaScarti/(trades.size()-1));
+			bidAskSpread = (float) sommaSpread/trades.size();
+			bookImpact = (float) sommaBookImpact/totalTurnover;}
+		catch (Exception exc){
+			System.out.println("eccezione!");
+			System.out.println("trades.size(): "+trades.size());
+			exc.printStackTrace();}
 	}
-			//System.out.println("IPERCOMPRATO = "+qCompratoGrandiH+"/"+qTotaleGrandiH+" = "+ipercomprato);
-			//grafico.addIpercomprato(ipercomprato, tick.timestamp);
-		
-		
-//		if (tick.codalfa.compareTo("YNAP")==0)
-//			System.out.println(tick.timestamp + " YNAP iper="+ipercomprato + "  n tradeGrossi:"+nTradeGrossi);
-		
-		//QUI AGGIORNAVAMO IL TEMPO USCITA ULTIMO TRADE
-		//if (trades.size()>0) tempoUscitaUltimoTrade = trades.get(trades.size()-1).exitTime.getTime();
-		
-		//qui abbiamo le variabili aggiornate, decidiamo se entrare nel trade
-		
-//		for (int i=0;i<metodi.size();i++) {
-//			metodi.get(i).aggiorna(this);
-//		}
-		
-//	}
-
-
+	
 	@Override
 	public void update(Observable arg0, Object arg1) {	
 		String s = (String)arg1;

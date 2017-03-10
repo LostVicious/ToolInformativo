@@ -50,6 +50,7 @@ public class GUI implements Observer {
 	javax.swing.text.AttributeSet green;
 	
 	long lastUIupdate = 0;
+	boolean showGUI = true;
 	
 	ArrayList<StockListener> titoliInAscolto = new ArrayList<StockListener>();
 	
@@ -63,9 +64,11 @@ public class GUI implements Observer {
 		}
 		//JLabel nomeFileAperto = new JLabel("(no data file)");
 		
-		frame = new JFrame("HEDGE BRAIN");
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		if (showGUI) {
 		
+			frame = new JFrame("HEDGE BRAIN");
+			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			
 //		JButton bottoneStop = new JButton("CHIUDI POSIZIONI");
 //		bottoneStop.addActionListener(new ActionListener() {
 //			@Override
@@ -92,41 +95,42 @@ public class GUI implements Observer {
 //		});/**/
 		
 		JButton ordina = new JButton("Ordina per Market Delta");
-		ordina.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				Collections.sort(titoliInAscolto, (StockListener s1, StockListener s2) ->{
-					if (s1.marketorderdelta>s2.marketorderdelta) return 1;
-					else return -1;
-				});
-			}
-		});/**/
-		
-		barraTop = new JPanel();
-		barraTop.setLayout(new BoxLayout(barraTop, BoxLayout.Y_AXIS));
-		//barraTop.add(nomeFileAperto);
-		frame.add(barraTop,BorderLayout.NORTH);
-		JPanel centrale = new JPanel();
-		centrale.setBackground(Color.BLACK);
-		//centrale.add(bottoneStop);
-		centrale.add(ordina);
-		
-		JTextPane bookArea = new JTextPane();
-		bookArea.setEditable(false);
-		bookArea.setFont(new Font("Verdana", 1, 12));
-		bookArea.setBackground(Color.BLACK);
-		JScrollPane jsp = new JScrollPane(bookArea);
-		StyleContext sc = StyleContext.getDefaultStyleContext();
-		green = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Foreground, Color.green);
-		barraTop.add(jsp);
-		doc = bookArea.getStyledDocument();
-		
-		frame.getContentPane().add(centrale,BorderLayout.CENTER);
-		destra = new JPanel();
-		frame.add(destra,BorderLayout.EAST);
-		//frame.pack();
-		frame.setSize(700, 400);
-		frame.setVisible(true);
+			ordina.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					Collections.sort(titoliInAscolto, (StockListener s1, StockListener s2) ->{
+						if (s1.marketorderdelta>s2.marketorderdelta) return 1;
+						else return -1;
+					});
+				}
+			});/**/
+			
+			barraTop = new JPanel();
+			barraTop.setLayout(new BoxLayout(barraTop, BoxLayout.Y_AXIS));
+			//barraTop.add(nomeFileAperto);
+			frame.add(barraTop,BorderLayout.NORTH);
+			JPanel centrale = new JPanel();
+			centrale.setBackground(Color.BLACK);
+			//centrale.add(bottoneStop);
+			centrale.add(ordina);
+			
+			JTextPane bookArea = new JTextPane();
+			bookArea.setEditable(false);
+			bookArea.setFont(new Font("Verdana", 1, 12));
+			bookArea.setBackground(Color.BLACK);
+			JScrollPane jsp = new JScrollPane(bookArea);
+			StyleContext sc = StyleContext.getDefaultStyleContext();
+			green = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Foreground, Color.green);
+			barraTop.add(jsp);
+			doc = bookArea.getStyledDocument();
+			
+			frame.getContentPane().add(centrale,BorderLayout.CENTER);
+			destra = new JPanel();
+			frame.add(destra,BorderLayout.EAST);
+			//frame.pack();
+			frame.setSize(700, 400);
+			frame.setVisible(true);
+		}
 	}
 	
 	public void addTitoloInAscolto(StockListener s) {
@@ -139,14 +143,16 @@ public class GUI implements Observer {
 		
 		try {doc.remove(0, doc.getLength());} catch (Exception e) {}
 		//JLabel spiegazione = new JLabel("<html><pre>CodAlfa\tQeuro  \tIpercomprato \tVWAP \tvwapRatio</pre></html>" );
-		try {doc.insertString(doc.getLength(),"Titolo \tContrTot \tContr30 \t#Trades \tContr.Medio Delta \tBuyPerc. \tStdDev \tSpread \tImpact\n",green);} catch (Exception e) {e.printStackTrace();}
+		try {doc.insertString(doc.getLength(),"Titolo \tContrTot \tContr30 \t#Trades \tContr.Medio Delta \tBuyPerc. \tStdDev \tSpread \tImpact\n",green);} catch (Exception e) {}
 		//barraTop.add(spiegazione);
 		for (int i=0;i<titoliInAscolto.size();i++) {
 			StockListener s = titoliInAscolto.get(i);
 			//JLabel nomeFileAperto = new JLabel("<html><pre>"+ s.codAlfa + "\t" + s.Qeuro + "\t    " + s.ipercomprato + "\t\t" + s.vwap  + "\t" + s.vwapRatio +" </pre></html>" );
 			String stringa = ""+ s.codAlfa + "\t" +s.totalTurnover+"1t"+ s.turnover + "\t\t\t\t \t   " + s.numberoftrades + "\t\t" + s.averageturnover + "\t\t" + s.marketorderdelta  + "\t\t\t" + s.marketbuypercentage + "\t" + s.standardDeviation+ "\t" + s.bidAskSpread + "\t" + s.bookImpact+"\n";
 			stringa = String.format("%s \t%d \t%d \t%d \t%d \t%+d \t%.2f \t%.5f \t%.2f \t%.2f \n", s.codAlfa, s.totalTurnover, s.turnover, s.numberoftrades, s.averageturnover ,  s.marketorderdelta, s.marketbuypercentage, s.standardDeviation, s.bidAskSpread, s.bookImpact);
-			try {doc.insertString(doc.getLength(),stringa,green);} catch (Exception e) {e.printStackTrace();}
+			try {doc.insertString(doc.getLength(),stringa,green);} catch (Exception e) {}
+			
+			if (!showGUI) System.out.println(stringa);
 			//barraTop.add(nomeFileAperto);
 			
 			//frame.getContentPane().validate();
@@ -167,16 +173,19 @@ public class GUI implements Observer {
 		
 		//try {doc.insertString(doc.getLength(),"vwap FTSE:  "+vwapRatioFTSE.getVwapFTSE(titoliInAscolto)+"\n",green);} catch (Exception e) {e.printStackTrace();}
 //		frame.setTitle("vwap FTSE:  "+vwapRatioFTSE.getVwapFTSE(titoliInAscolto));
-		frame.setTitle("Tool Informativo");
+		
+		if (showGUI) frame.setTitle("Tool Informativo");
 	}
 	
 	public void aggiornaPosizioni() {
-		destra.removeAll();
-		GestioneOrdini gi = GestioneOrdini.getInstance();
-		for (Map.Entry<String, Posizione> entry : gi.posizioni.entrySet()) {
-			destra.add(new JLabel("<html><pre>"+entry.getKey()+ " " + entry.getValue().Q+"</pre></html>"));
-			frame.getContentPane().validate();
-			frame.getContentPane().repaint();
+		if (showGUI) {
+			destra.removeAll();
+			GestioneOrdini gi = GestioneOrdini.getInstance();
+			for (Map.Entry<String, Posizione> entry : gi.posizioni.entrySet()) {
+				destra.add(new JLabel("<html><pre>"+entry.getKey()+ " " + entry.getValue().Q+"</pre></html>"));
+				frame.getContentPane().validate();
+				frame.getContentPane().repaint();
+			}
 		}
 	}
 	
