@@ -75,8 +75,11 @@ public class TestSocket {
 //		gui.addTitoloInAscolto(new StockListener("TRN",25000,85,player, new ArrayList<Metodo>() ));
 //		gui.addTitoloInAscolto(new StockListener("UBI",25000,85,player, new ArrayList<Metodo>() ));
 //		gui.addTitoloInAscolto(new StockListener("UCG=",1,30,player, new ArrayList<Metodo>() ));
-		gui.addTitoloInAscolto(new StockListener("EIT",30,player, new ArrayList<Metodo>() ));
-//		gui.addTitoloInAscolto(new StockListener("EM",30,player, new ArrayList<Metodo>() ));
+		
+		
+//		gui.addTitoloInAscolto(new StockListener("EIT",30,player, new ArrayList<Metodo>() ));
+		gui.addTitoloInAscolto(new StockListener("LX.EURUSD",30,player, new ArrayList<Metodo>() ));
+		
 //		gui.addTitoloInAscolto(new StockListener("ELN",30,player, new ArrayList<Metodo>() ));
 //		gui.addTitoloInAscolto(new StockListener("SO",30,player, new ArrayList<Metodo>() ));
 //		gui.addTitoloInAscolto(new StockListener("UNI",25000,85,player, new ArrayList<Metodo>() ));
@@ -161,7 +164,7 @@ public class TestSocket {
 			sentence = inFromServer.readLine();   
 			if ( SCRIVI_FILE_DATI ) ds.writeLine(sentence);
 			
-			outToServer.writeBytes("SUB EIT\n");
+			outToServer.writeBytes("SUB LX.EURUSD\n");
 			//outToServer.writeBytes("SUB LX.EURUSD,LX.EURAUD,LX.EURGBP,LX.EURJPY,LX.EURRUB,LX.EURCAD,LX.EURCHF,LX.STOXX5,A2A,AZM,BMPS,BP,LUX,SFER,YNAP\n"); 
 			//outToServer.writeBytes("SUB LX.FGDAXI,LX.STOXX5,FIB4L,CM.ESZ4,F,G,ENI,LUX,ENEL,MS,UCG,ISP,TIT,BMPS,BP,UBI,A2A,SRG,TRN,MB,PC,TEN,AGL,AZM,EXO,SPM,MED\n");
 			if ( SCRIVI_FILE_DATI ) ds.writeLine(sentence);
@@ -201,7 +204,7 @@ public class TestSocket {
 						inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));   
 						sentence = inFromServer.readLine();   						
 						if ( SCRIVI_FILE_DATI ) ds.writeLine(sentence);
-						outToServer.writeBytes("SUB EIT\n");
+						outToServer.writeBytes("SUB LX.EURUSD\n");
 						if ( SCRIVI_FILE_DATI ) ds.writeLine(sentence);
 						ultimoDatoBook = System.currentTimeMillis();  
 					} catch(Exception ex) {

@@ -63,7 +63,15 @@ public class StockDatabaseMYSQL {
 
 	
 	public void insertTick(Tick tick) {
+			System.out.println(tsFormat.format(tick.timestamp));
 			doUpdate("INSERT INTO TOOLINFORMATIVO(codalfa,timestamp,price,volume,buy,market) VALUES('"+tick.codalfa+"','"+tsFormat.format(tick.timestamp)+"',"+tick.price+","+tick.volume+","+tick.buy+","+tick.market+");");
 	}
 
+	
+	
+	public void inserisciIndicatori(Indicatori I) {
+		System.out.println(I.timestampIndicatori);
+		doUpdate("insert into indicatoridaily(codalfa,timestamp,totalturnover,turnover30,numberoftrades30,averageturnover30,marketorderdelta30,marketbuypercentage30,standarddeviation,spread,bookimpact) VALUES('"+I.codAlfa+"','"+tsFormat.format(I.timestampIndicatori)+"',"+I.totalTurnover+","+I.turnover+","+I.numberoftrades+","+I.averageturnover+","+I.marketorderdelta+","+I.marketbuypercentage+","+I.standardDeviation+","+I.bidAskSpread+","+I.bookImpact+");");
+}
+	
 }
