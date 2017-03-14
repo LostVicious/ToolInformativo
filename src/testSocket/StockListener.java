@@ -139,31 +139,36 @@ public class StockListener implements Observer {
 
 		
 		for (trade t : trades)
-		    System.out.println(t.timestamp+" prezzo: "+t.price+"volume: "+t.volume+" controvalore: "+t.val+"€ vwap: "+t.vwap+"spread: "+t.spread+" Impatto: "+t.impact);
+		    System.out.println(t.timestamp+" prezzo: "+t.price+" volume: "+t.volume+" controvalore: "+t.val+"€ vwap: "+t.vwap+"spread: "+t.spread+" Impatto: "+t.impact);
 		
-		System.out.println("tick.timestamp: "+tick.timestamp);
+		try {
+
+			File file = new File(codAlfa+".tmp");
+			
+		      if (file.createNewFile()){
+			        System.out.println("File is created!");
+			      }else{
+			        System.out.println("File already exists.");
+			      }
+
+				FileOutputStream fop = new FileOutputStream(file);
+				ObjectOutputStream oos = new ObjectOutputStream(fop);
+				oos.writeObject(trades);
+				oos.close();
+		      
+		    	} catch (IOException e) {
+			      e.printStackTrace();
+			}
+
+			
+		
+		
 		calcolaIndicatori(tick.timestamp);
 }
 
 		
 		
-//		try {
-//
-//			File file = new File(codAlfa+".tmp");
-//			FileOutputStream fop = new FileOutputStream(file);
-//
-//			// if file doesnt exists, then create it
-//			if (!file.exists()) {
-//				file.createNewFile();}
-//			
-//			ObjectOutputStream oos = new ObjectOutputStream(fop);
-//			oos.writeObject(trades);
-//			oos.close();}
-//			
-//		catch (IOException e) {
-//		
-//			e.printStackTrace();
-//		}	
+
 
 
 	public void calcolaIndicatori (Date timestamp) {
@@ -204,7 +209,7 @@ public class StockListener implements Observer {
 			System.out.println("qTotaleTrades: "+qTotaleTrades);
 			e.printStackTrace();}
 		try {
-			standardDeviation = Math.sqrt(sommaScarti/(trades.size()));
+			standardDeviation = (trades.size()==1 ? Math.sqrt(sommaScarti/(trades.size())) : Math.sqrt(sommaScarti/(trades.size()-1)));
 			bidAskSpread = (float) sommaSpread/trades.size();
 			bookImpact = (float) sommaBookImpact/totalTurnover;}
 		catch (Exception exc){
@@ -213,7 +218,6 @@ public class StockListener implements Observer {
 			exc.printStackTrace();}
 		
 		Indicatori I = new Indicatori(codAlfa,timestampIndicatori,totalTurnover,turnover,numberoftrades,averageturnover,marketorderdelta,marketbuypercentage,standardDeviation,bidAskSpread,bookImpact);
-		
 //	StockListener s = new StockListener(codAlfa,30,player, new ArrayList<Metodo>() );
 //	StockListener st = gui.titoliInAscolto.get(indexOf(s));
 //		
