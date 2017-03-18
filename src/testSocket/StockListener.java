@@ -1,12 +1,12 @@
 package testSocket;
 
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Deque;
@@ -14,6 +14,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 
 public class StockListener implements Observer {
 	String codAlfa;
@@ -45,24 +47,14 @@ public class StockListener implements Observer {
 	float bookImpact = 1f;
 	int ora = 0, minuto = 0;
 	Tick tick;
+	File file;
 	
 	StockDatabaseMYSQL db = new StockDatabaseMYSQL();
+	DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
 	
 	
-	
-	
-	public class trade implements Serializable{
-		long timestampLong;
-		  Date timestamp;
-		  float price;
-		  int volume;
-		  int val;
-		  float vwap;
-		  int spread;
-		  int impact;
-		  public trade(long tL, Date t, float p, int vol, int val, float vw, int spr, int imp) {this.timestampLong=tL;this.timestamp=t;this.price=p;this.volume=vol;this.val=val;this.vwap=vw;this.spread=spr;this.impact=imp;}
-		};
-	ArrayList<trade> trades = new ArrayList<trade>();
+	ArrayList<Trade> trades = new ArrayList<Trade>();
 
 	public StockListener(String codalfa,
 			int finestraTemporale, Observable player, List<Metodo> metodi) {
@@ -72,6 +64,24 @@ public class StockListener implements Observer {
 		this.player = player;
 		this.metodi = metodi;
 		player.addObserver(this);
+		this.file = new File(dateFormat.format(new Date(System.currentTimeMillis()))+"-"+codalfa+".tmp");
+		try {
+			System.out.println("isFile: "+file.isFile());
+			if (!file.isFile()){
+				file.createNewFile();
+				System.out.println("File is created!");}
+			else{
+	        System.out.println("File already exists.");
+	        FileInputStream fis = new FileInputStream(file);
+	        ObjectInputStream ois = new ObjectInputStream(fis);
+	        System.out.println(ois.readObject());
+//	        this.trades = (ArrayList<Trade>) ois.readObject();
+	        ois.close();
+			}
+			}
+		catch (IOException | ClassNotFoundException e) {
+		      e.printStackTrace();
+		}
 	}
 
 
@@ -134,25 +144,23 @@ public class StockListener implements Observer {
 			ImpactBuy=1;
 			ImpactSell=1;}
 		
+		Trade tr = new Trade(tick.timestamp.getTime(),tick.timestamp,tick.codalfa,price,tick.volume,(int) (tick.buy ? (float)price*tick.volume : -(float)price*tick.volume),vwap,standardDeviation,lastSpread,(int) (tick.buy ? ImpactBuy : ImpactSell));
 
-		trades.add(new trade(tick.timestamp.getTime(),tick.timestamp,price,tick.volume,(int) (tick.buy ? (float)price*tick.volume : -(float)price*tick.volume),vwap,lastSpread,(int) (tick.buy ? ImpactBuy : ImpactSell)));
+		trades.add(tr);
 
+		db.inserisciTrade(tr);
 		
-		for (trade t : trades)
-		    System.out.println(t.timestamp+" prezzo: "+t.price+" volume: "+t.volume+" controvalore: "+t.val+"€ vwap: "+t.vwap+"spread: "+t.spread+" Impatto: "+t.impact);
+		for (Trade t : trades)
+		    System.out.println(t.timestamp+" codalfa: "+t.codalfa+" prezzo: "+t.price+" volume: "+t.volume+" controvalore: "+t.turnover+"€ vwap: "+t.vwap+" standard deviation:"+standardDeviation+" spread: "+t.spread+" Impatto: "+t.impact);
 		
 		try {
 
-			File file = new File(codAlfa+".tmp");
-			
-		      if (file.createNewFile()){
-			        System.out.println("File is created!");
-			      }else{
-			        System.out.println("File already exists.");
-			      }
-
-				FileOutputStream fop = new FileOutputStream(file);
+			    FileOutputStream fop = new FileOutputStream(file);
 				ObjectOutputStream oos = new ObjectOutputStream(fop);
+				
+				
+//				System.out.println(trades);
+//				System.out.println(trades.size());
 				oos.writeObject(trades);
 				oos.close();
 		      
@@ -184,15 +192,15 @@ public class StockListener implements Observer {
 		for (int k=0;k<trades.size();k++) {
 			sommaScarti+=Math.pow(trades.get(k).price-trades.get(k).vwap, 2);
 			sommaSpread+=trades.get(k).spread;
-			sommaBookImpact+=trades.get(k).impact*Math.abs(trades.get(k).val);
+			sommaBookImpact+=trades.get(k).impact*Math.abs(trades.get(k).turnover);
 			if ((trades.get(k).timestampLong >= tempoIniziale ) && (eNegoziazioneContinua(trades.get(k).timestamp))){
 				numberoftrades++;
-				int val = trades.get(k).val;
-				if (val>0) {
-					qTotaleTrades+=val;
-					qCompratoTrades+=val;
+				int turn = trades.get(k).turnover;
+				if (turn>0) {
+					qTotaleTrades+=turn;
+					qCompratoTrades+=turn;
 				} else {
-					qTotaleTrades+=-val;
+					qTotaleTrades+=-turn;
 				}
 			}
 		}
@@ -218,11 +226,10 @@ public class StockListener implements Observer {
 			exc.printStackTrace();}
 		
 		Indicatori I = new Indicatori(codAlfa,timestampIndicatori,totalTurnover,turnover,numberoftrades,averageturnover,marketorderdelta,marketbuypercentage,standardDeviation,bidAskSpread,bookImpact);
-//	StockListener s = new StockListener(codAlfa,30,player, new ArrayList<Metodo>() );
-//	StockListener st = gui.titoliInAscolto.get(indexOf(s));
-//		
+
+		
 		db.inserisciIndicatori(I);
-//	
+
 	
 	}
 	@Override
