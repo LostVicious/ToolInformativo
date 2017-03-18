@@ -22,7 +22,7 @@ public class vwapRatioFTSE {
 		        Class.forName("com.mysql.jdbc.Driver");
 		        conn = DriverManager.getConnection("jdbc:mysql://localhost/?user=root&password=zxcvbnm");
 		        
-		        Statement s = conn.createStatement();
+		        conn.createStatement();
 		        conn.setCatalog("hedgefund");
 		        
 		        Statement stmt = conn.createStatement();

@@ -45,6 +45,8 @@ public class StockListener implements Observer {
 	double standardDeviation = 0f;
 	float bidAskSpread = 1f;
 	float bookImpact = 1f;
+	float bookImpactBuy = 1f;
+	float bookImpactSell = 1f;
 	int ora = 0, minuto = 0;
 	Tick tick;
 	File file;
@@ -112,15 +114,15 @@ public class StockListener implements Observer {
 
 		
 		//aggiorniamo il vwap
-		vwap = (vwap*volumeTotale + ((float)price*tick.volume))/(volumeTotale+tick.volume);
-		volumeTotale+=tick.volume;
-		codaVwap.addFirst(vwap);
-		while (codaVwap.size()>60) codaVwap.removeLast(); //delta vwap a un minuto circa
-		deltaVwap = vwap-codaVwap.getLast();
-		vwapRatio = price/vwap;
-		
-
-		totalTurnover+=(float)price*tick.volume;
+//		vwap = (vwap*volumeTotale + ((float)price*tick.volume))/(volumeTotale+tick.volume);
+//		volumeTotale+=tick.volume;
+//		codaVwap.addFirst(vwap);
+//		while (codaVwap.size()>60) codaVwap.removeLast(); //delta vwap a un minuto circa
+//		deltaVwap = vwap-codaVwap.getLast();
+//		vwapRatio = price/vwap;
+//		
+//
+//		totalTurnover+=(float)price*tick.volume;
 		
 
 		System.out.println("lastAsk: "+lastAsk);
@@ -185,22 +187,32 @@ public class StockListener implements Observer {
 //		System.out.println("timestampIndicatori è: "+timestampIndicatori);
 		long tempoIniziale = tick.timestamp.getTime() - 1000 * 60 * finestraTemporale; //30 minuti
 		int qTotaleTrades = 0, qCompratoTrades = 0;
+		int volumeTotale=0;
+		int totalTurnover=0;
+		float vwap=0f;
 		numberoftrades = 0;
 		double sommaScarti=0;
 		int sommaSpread=0;
 		int sommaBookImpact=0;
+		int sommaBookImpactBuy=0;
+		int sommaBookImpactSell=0;
 		for (int k=0;k<trades.size();k++) {
+			vwap = (vwap*volumeTotale + ((float)Math.abs(trades.get(k).turnover)))/(volumeTotale+trades.get(k).volume);
+			volumeTotale+=trades.get(k).volume;
+			totalTurnover+=Math.abs(trades.get(k).turnover);
 			sommaScarti+=Math.pow(trades.get(k).price-trades.get(k).vwap, 2);
-			sommaSpread+=trades.get(k).spread;
-			sommaBookImpact+=trades.get(k).impact*Math.abs(trades.get(k).turnover);
 			if ((trades.get(k).timestampLong >= tempoIniziale ) && (eNegoziazioneContinua(trades.get(k).timestamp))){
 				numberoftrades++;
+				sommaSpread+=trades.get(k).spread;
+				sommaBookImpact+=trades.get(k).impact*Math.abs(trades.get(k).turnover);
 				int turn = trades.get(k).turnover;
 				if (turn>0) {
 					qTotaleTrades+=turn;
 					qCompratoTrades+=turn;
+					sommaBookImpactBuy+=trades.get(k).impact*turn;
 				} else {
 					qTotaleTrades+=-turn;
+					sommaBookImpactSell+=trades.get(k).impact*-turn;
 				}
 			}
 		}
@@ -210,7 +222,10 @@ public class StockListener implements Observer {
 		marketorderdelta = qCompratoTrades-(qTotaleTrades-qCompratoTrades);	
 		try {
 		averageturnover = (int) qTotaleTrades/numberoftrades;
-		marketbuypercentage = (float)qCompratoTrades/qTotaleTrades;}
+		marketbuypercentage = (float)qCompratoTrades/qTotaleTrades;
+		bookImpact = (float) sommaBookImpact/qTotaleTrades;
+		bookImpactBuy = (float) sommaBookImpactBuy/qCompratoTrades;
+		bookImpactSell = (float) sommaBookImpactSell/(qTotaleTrades-qCompratoTrades);}
 		catch (Exception e) {
 			System.out.println("eccezione!");
 			System.out.println("numberoftrades: "+numberoftrades);
@@ -218,14 +233,13 @@ public class StockListener implements Observer {
 			e.printStackTrace();}
 		try {
 			standardDeviation = (trades.size()==1 ? Math.sqrt(sommaScarti/(trades.size())) : Math.sqrt(sommaScarti/(trades.size()-1)));
-			bidAskSpread = (float) sommaSpread/trades.size();
-			bookImpact = (float) sommaBookImpact/totalTurnover;}
+			bidAskSpread = (float) sommaSpread/trades.size();}
 		catch (Exception exc){
 			System.out.println("eccezione!");
 			System.out.println("trades.size(): "+trades.size());
 			exc.printStackTrace();}
 		
-		Indicatori I = new Indicatori(codAlfa,timestampIndicatori,totalTurnover,turnover,numberoftrades,averageturnover,marketorderdelta,marketbuypercentage,standardDeviation,bidAskSpread,bookImpact);
+		Indicatori I = new Indicatori(codAlfa,timestampIndicatori,totalTurnover,turnover,numberoftrades,averageturnover,marketorderdelta,marketbuypercentage,standardDeviation,bidAskSpread,bookImpact,bookImpactBuy,bookImpactSell);
 
 		
 		db.inserisciIndicatori(I);

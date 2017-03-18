@@ -30,7 +30,6 @@ public class TestSocket {
 		
 		boolean SCRIVI_FILE_DATI = false;
 		
-		GestioneOrdini gestioneOrdini = GestioneOrdini.getInstance();
 		PlayerRealTime player = new PlayerRealTime();
 		
 		

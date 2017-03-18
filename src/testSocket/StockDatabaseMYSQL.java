@@ -72,7 +72,7 @@ public class StockDatabaseMYSQL {
 
 	
 	public void inserisciIndicatori(Indicatori I) {
-		doUpdate("insert into indicatoridaily(codalfa,timestamp,totalturnover,turnover30,numberoftrades30,averageturnover30,marketorderdelta30,marketbuypercentage30,standarddeviation,spread,bookimpact) values('"+I.codAlfa+"','"+tsFormat.format(I.timestampIndicatori)+"',"+I.totalTurnover+","+I.turnover+","+I.numberoftrades+","+I.averageturnover+","+I.marketorderdelta+","+I.marketbuypercentage+","+I.standardDeviation+","+I.bidAskSpread+","+I.bookImpact+");");
+		doUpdate("insert into indicatoridaily(codalfa,timestamp,totalturnover,turnover30,numberoftrades30,averageturnover30,marketorderdelta30,marketbuypercentage30,standarddeviation,spread30,bookimpact30,bookimpactbuy30,bookimpactsell30) values('"+I.codAlfa+"','"+tsFormat.format(I.timestampIndicatori)+"',"+I.totalTurnover+","+I.turnover+","+I.numberoftrades+","+I.averageturnover+","+I.marketorderdelta+","+I.marketbuypercentage+","+I.standardDeviation+","+I.bidAskSpread+","+I.bookImpact+","+I.bookImpactBuy+","+I.bookImpactSell+");");
 }
 	
 }
