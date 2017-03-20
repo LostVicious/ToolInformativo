@@ -74,14 +74,14 @@ public class StockListener implements Observer {
 				System.out.println("File is created!");}
 			else{
 	        System.out.println("File already exists.");
-	        FileInputStream fis = new FileInputStream(file);
-	        ObjectInputStream ois = new ObjectInputStream(fis);
-	        System.out.println(ois.readObject());
-//	        this.trades = (ArrayList<Trade>) ois.readObject();
-	        ois.close();
+//	        FileInputStream fis = new FileInputStream(file);
+//	        ObjectInputStream ois = new ObjectInputStream(fis);
+////	        System.out.println(ois.readObject());
+////	        this.trades = (ArrayList<Trade>) ois.readObject();
+//	        ois.close();
 			}
 			}
-		catch (IOException | ClassNotFoundException e) {
+		catch (IOException  e) {
 		      e.printStackTrace();
 		}
 	}
@@ -114,15 +114,15 @@ public class StockListener implements Observer {
 
 		
 		//aggiorniamo il vwap
-//		vwap = (vwap*volumeTotale + ((float)price*tick.volume))/(volumeTotale+tick.volume);
-//		volumeTotale+=tick.volume;
+		vwap = (vwap*volumeTotale + ((float)price*tick.volume))/(volumeTotale+tick.volume);
+		volumeTotale+=tick.volume;
 //		codaVwap.addFirst(vwap);
 //		while (codaVwap.size()>60) codaVwap.removeLast(); //delta vwap a un minuto circa
 //		deltaVwap = vwap-codaVwap.getLast();
 //		vwapRatio = price/vwap;
-//		
-//
-//		totalTurnover+=(float)price*tick.volume;
+		
+
+		totalTurnover+=(float)price*tick.volume;
 		
 
 		System.out.println("lastAsk: "+lastAsk);
@@ -187,9 +187,9 @@ public class StockListener implements Observer {
 //		System.out.println("timestampIndicatori è: "+timestampIndicatori);
 		long tempoIniziale = tick.timestamp.getTime() - 1000 * 60 * finestraTemporale; //30 minuti
 		int qTotaleTrades = 0, qCompratoTrades = 0;
-		int volumeTotale=0;
+//		int volumeTotale=0;
 		int totalTurnover=0;
-		float vwap=0f;
+//		float vwap=0f;
 		numberoftrades = 0;
 		double sommaScarti=0;
 		int sommaSpread=0;
@@ -197,9 +197,13 @@ public class StockListener implements Observer {
 		int sommaBookImpactBuy=0;
 		int sommaBookImpactSell=0;
 		for (int k=0;k<trades.size();k++) {
-			vwap = (vwap*volumeTotale + ((float)Math.abs(trades.get(k).turnover)))/(volumeTotale+trades.get(k).volume);
-			volumeTotale+=trades.get(k).volume;
+//			vwap = (vwap*volumeTotale + ((float)(trades.get(k).price*trades.get(k).volume)))/(volumeTotale+trades.get(k).volume);
+//			System.out.println("price*volume: "+(float)(trades.get(k).price*trades.get(k).volume));
+//			System.out.println("vwap: "+vwap);
+//			volumeTotale+=trades.get(k).volume;
+//			System.out.println("volumeTotale: "+volumeTotale);
 			totalTurnover+=Math.abs(trades.get(k).turnover);
+			System.out.println("totalTurnover: "+totalTurnover);
 			sommaScarti+=Math.pow(trades.get(k).price-trades.get(k).vwap, 2);
 			if ((trades.get(k).timestampLong >= tempoIniziale ) && (eNegoziazioneContinua(trades.get(k).timestamp))){
 				numberoftrades++;
@@ -224,8 +228,8 @@ public class StockListener implements Observer {
 		averageturnover = (int) qTotaleTrades/numberoftrades;
 		marketbuypercentage = (float)qCompratoTrades/qTotaleTrades;
 		bookImpact = (float) sommaBookImpact/qTotaleTrades;
-		bookImpactBuy = (float) sommaBookImpactBuy/qCompratoTrades;
-		bookImpactSell = (float) sommaBookImpactSell/(qTotaleTrades-qCompratoTrades);}
+		bookImpactBuy = (qCompratoTrades!=0 ? (float) sommaBookImpactBuy/qCompratoTrades : 1);
+		bookImpactSell = (qTotaleTrades>qCompratoTrades ? (float) sommaBookImpactSell/(qTotaleTrades-qCompratoTrades) : 1);}
 		catch (Exception e) {
 			System.out.println("eccezione!");
 			System.out.println("numberoftrades: "+numberoftrades);

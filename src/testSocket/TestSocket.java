@@ -77,7 +77,7 @@ public class TestSocket {
 //		gui.addTitoloInAscolto(new StockListener("YNAP",30,player, new ArrayList<Metodo>() ));
 		
 		
-//		gui.addTitoloInAscolto(new StockListener("ELN",30,player, new ArrayList<Metodo>() ));
+//		gui.addTitoloInAscolto(new StockListener("GE",30,player, new ArrayList<Metodo>() ));
 //		gui.addTitoloInAscolto(new StockListener("MN",30,player, new ArrayList<Metodo>() ));
 //		gui.addTitoloInAscolto(new StockListener("LX.EURUSD",30,player, new ArrayList<Metodo>() ));
 //		gui.addTitoloInAscolto(new StockListener("LX.USDJPY",30,player, new ArrayList<Metodo>() ));
@@ -94,7 +94,7 @@ public class TestSocket {
 			sentence = inFromServer.readLine();   
 			if ( SCRIVI_FILE_DATI ) ds.writeLine(sentence);
 			
-//			outToServer.writeBytes("SUB LX.EURUSD,LX.USDJPY\n");
+//			outToServer.writeBytes("SUB GE\n");
 			outToServer.writeBytes("SUB A2A,ANIM,AZM,BMED,BAMI,ENEL,ENI,EXO,FCA,G,ISP,LDO,MB,RACE,UBI,UNI,UCG\n");
 			if ( SCRIVI_FILE_DATI ) ds.writeLine(sentence);
 			
@@ -125,7 +125,7 @@ public class TestSocket {
 						sentence = inFromServer.readLine();   						
 						if ( SCRIVI_FILE_DATI ) ds.writeLine(sentence);
 						outToServer.writeBytes("SUB A2A,ANIM,AZM,BMED,BAMI,ENEL,ENI,EXO,FCA,G,ISP,LDO,MB,RACE,UBI,UNI,UCG\n");
-//						outToServer.writeBytes("SUB LX.EURUSD,LX.USDJPY\n");
+//						outToServer.writeBytes("SUB GE\n");
 						if ( SCRIVI_FILE_DATI ) ds.writeLine(sentence);
 						ultimoDatoBook = System.currentTimeMillis();  
 					} catch(Exception ex) {
