@@ -129,17 +129,17 @@ public class StockListener implements Observer {
 		System.out.println("lastBid: "+lastBid);
 		
 		if (lastAsk!=0.0 && lastBid!=0.0) {
-			System.out.println(GestioneOrdini.tickSizeFromPriceFloat(lastAsk));
-			System.out.println((lastAsk-lastBid));
+//			System.out.println(GestioneOrdini.tickSizeFromPriceFloat(lastAsk));
+//			System.out.println((lastAsk-lastBid));
 			lastSpread=Math.round(((lastAsk-lastBid)/GestioneOrdini.tickSizeFromPriceFloat(lastAsk)));
-			System.out.println(lastSpread);
+//			System.out.println(lastSpread);
 			ImpactBuy=Math.abs(Math.round((price-lastAsk)/GestioneOrdini.tickSizeFromPriceFloat(lastAsk)))+1;
 			ImpactSell=Math.abs(Math.round((lastBid-price)/GestioneOrdini.tickSizeFromPriceFloat(lastAsk)))+1;
 			System.out.println("price : "+price);
-			System.out.println("Math.round: "+Math.round((price-lastAsk)/GestioneOrdini.tickSizeFromPriceFloat(lastAsk)));
-			System.out.println("Math.Abs: "+Math.abs(Math.round((price-lastAsk)/GestioneOrdini.tickSizeFromPriceFloat(lastAsk))));
-			System.out.println("ImpactBuy: "+ImpactBuy);
-			System.out.println("ImpactSell: "+ImpactSell);
+//			System.out.println("Math.round: "+Math.round((price-lastAsk)/GestioneOrdini.tickSizeFromPriceFloat(lastAsk)));
+//			System.out.println("Math.Abs: "+Math.abs(Math.round((price-lastAsk)/GestioneOrdini.tickSizeFromPriceFloat(lastAsk))));
+//			System.out.println("ImpactBuy: "+ImpactBuy);
+//			System.out.println("ImpactSell: "+ImpactSell);
 		}
 		else {
 			lastSpread=1;
@@ -194,12 +194,12 @@ public class StockListener implements Observer {
 		int sommaBookImpactBuy=0;
 		int sommaBookImpactSell=0;
 		for (int k=0;k<trades.size();k++) {
-			sommaScarti+=Math.pow(trades.get(k).price-trades.get(k).vwap, 2);
+			sommaScarti+=Math.pow(((float) (trades.get(k).price-trades.get(k).vwap)/(trades.get(k).vwap)), 2);
 			if ((trades.get(k).timestampLong >= tempoIniziale ) && (eNegoziazioneContinua(trades.get(k).timestamp))){
 				numberoftrades++;
 				sommaSpread+=trades.get(k).spread;
-				sommaBookImpact+=trades.get(k).impact*Math.abs(trades.get(k).turnover);
 				int turn = trades.get(k).turnover;
+				sommaBookImpact+=trades.get(k).impact*Math.abs(turn);	
 				if (turn>0) {
 					qTotaleTrades+=turn;
 					qCompratoTrades+=turn;
@@ -217,9 +217,20 @@ public class StockListener implements Observer {
 		try {
 		averageturnover = (int) qTotaleTrades/numberoftrades;
 		marketbuypercentage = (float)qCompratoTrades/qTotaleTrades;
+		System.out.println("sommaBookImpact: "+sommaBookImpact);
+		System.out.println("qTotaleTrades: "+qTotaleTrades);
 		bookImpact = (float) sommaBookImpact/qTotaleTrades;
+		System.out.println("bookImpact: "+bookImpact);
+
+		System.out.println("sommaBookImpactBuy: "+sommaBookImpactBuy);
+		System.out.println("qCompratoTrades: "+qCompratoTrades);
 		bookImpactBuy = (qCompratoTrades!=0 ? (float) sommaBookImpactBuy/qCompratoTrades : 1);
-		bookImpactSell = (qTotaleTrades>qCompratoTrades ? (float) sommaBookImpactSell/(qTotaleTrades-qCompratoTrades) : 1);}
+		System.out.println("bookImpactBuy: "+bookImpactBuy);
+		System.out.println("sommaBookImpactSell: "+sommaBookImpactSell);
+		System.out.println("(qTotaleTrades-qCompratoTrades): "+(qTotaleTrades-qCompratoTrades));
+		bookImpactSell = (qTotaleTrades>qCompratoTrades ? (float) sommaBookImpactSell/(qTotaleTrades-qCompratoTrades) : 1);
+		System.out.println("bookImpactSell: "+bookImpactSell);}
+
 		catch (Exception e) {
 			System.out.println("eccezione!");
 			System.out.println("numberoftrades: "+numberoftrades);
