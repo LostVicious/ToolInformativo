@@ -187,9 +187,6 @@ public class StockListener implements Observer {
 //		System.out.println("timestampIndicatori è: "+timestampIndicatori);
 		long tempoIniziale = tick.timestamp.getTime() - 1000 * 60 * finestraTemporale; //30 minuti
 		int qTotaleTrades = 0, qCompratoTrades = 0;
-//		int volumeTotale=0;
-		int totalTurnover=0;
-//		float vwap=0f;
 		numberoftrades = 0;
 		double sommaScarti=0;
 		int sommaSpread=0;
@@ -197,13 +194,6 @@ public class StockListener implements Observer {
 		int sommaBookImpactBuy=0;
 		int sommaBookImpactSell=0;
 		for (int k=0;k<trades.size();k++) {
-//			vwap = (vwap*volumeTotale + ((float)(trades.get(k).price*trades.get(k).volume)))/(volumeTotale+trades.get(k).volume);
-//			System.out.println("price*volume: "+(float)(trades.get(k).price*trades.get(k).volume));
-//			System.out.println("vwap: "+vwap);
-//			volumeTotale+=trades.get(k).volume;
-//			System.out.println("volumeTotale: "+volumeTotale);
-			totalTurnover+=Math.abs(trades.get(k).turnover);
-			System.out.println("totalTurnover: "+totalTurnover);
 			sommaScarti+=Math.pow(trades.get(k).price-trades.get(k).vwap, 2);
 			if ((trades.get(k).timestampLong >= tempoIniziale ) && (eNegoziazioneContinua(trades.get(k).timestamp))){
 				numberoftrades++;
@@ -237,7 +227,7 @@ public class StockListener implements Observer {
 			e.printStackTrace();}
 		try {
 			standardDeviation = (trades.size()==1 ? Math.sqrt(sommaScarti/(trades.size())) : Math.sqrt(sommaScarti/(trades.size()-1)));
-			bidAskSpread = (float) sommaSpread/trades.size();}
+			bidAskSpread = (float) sommaSpread/numberoftrades;}
 		catch (Exception exc){
 			System.out.println("eccezione!");
 			System.out.println("trades.size(): "+trades.size());

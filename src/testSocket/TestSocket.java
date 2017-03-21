@@ -75,10 +75,11 @@ public class TestSocket {
 		gui.addTitoloInAscolto(new StockListener("UNI",30,player, new ArrayList<Metodo>() ));
 		gui.addTitoloInAscolto(new StockListener("UCG",30,player, new ArrayList<Metodo>() ));
 //		gui.addTitoloInAscolto(new StockListener("YNAP",30,player, new ArrayList<Metodo>() ));
+//		
 		
-		
-//		gui.addTitoloInAscolto(new StockListener("GE",30,player, new ArrayList<Metodo>() ));
-//		gui.addTitoloInAscolto(new StockListener("MN",30,player, new ArrayList<Metodo>() ));
+//		gui.addTitoloInAscolto(new StockListener("TECN",30,player, new ArrayList<Metodo>() ));
+//		gui.addTitoloInAscolto(new StockListener("PRT",30,player, new ArrayList<Metodo>() ));
+//		gui.addTitoloInAscolto(new StockListener("IF",30,player, new ArrayList<Metodo>() ));
 //		gui.addTitoloInAscolto(new StockListener("LX.EURUSD",30,player, new ArrayList<Metodo>() ));
 //		gui.addTitoloInAscolto(new StockListener("LX.USDJPY",30,player, new ArrayList<Metodo>() ));
 
@@ -94,7 +95,7 @@ public class TestSocket {
 			sentence = inFromServer.readLine();   
 			if ( SCRIVI_FILE_DATI ) ds.writeLine(sentence);
 			
-//			outToServer.writeBytes("SUB GE\n");
+//			outToServer.writeBytes("SUB TECN,PRT,IF\n");
 			outToServer.writeBytes("SUB A2A,ANIM,AZM,BMED,BAMI,ENEL,ENI,EXO,FCA,G,ISP,LDO,MB,RACE,UBI,UNI,UCG\n");
 			if ( SCRIVI_FILE_DATI ) ds.writeLine(sentence);
 			
