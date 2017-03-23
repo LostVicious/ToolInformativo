@@ -16,6 +16,7 @@ import java.util.Observable;
 import java.util.Observer;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.lang.Math;
 
 public class StockListener implements Observer {
 	String codAlfa;
@@ -91,6 +92,8 @@ public class StockListener implements Observer {
 	
 	Float lastBid = 0f;
 	Float lastAsk = 0f;
+	Float prezzoRiferimento = 0f;
+	Float prezzoApertura = 0f;
 	Boolean lastWasBuy = true, lastWasNeutral=false;
 	Long lastTickMillis = Long.MAX_VALUE;
 	String lastPriceString = "0";
@@ -146,7 +149,7 @@ public class StockListener implements Observer {
 			ImpactBuy=1;
 			ImpactSell=1;}
 		
-		Trade tr = new Trade(tick.timestamp.getTime(),tick.timestamp,tick.codalfa,price,tick.volume,(int) (tick.buy ? (float)price*tick.volume : -(float)price*tick.volume),vwap,standardDeviation,lastSpread,(int) (tick.buy ? ImpactBuy : ImpactSell));
+		Trade tr = new Trade(tick.timestamp.getTime(),tick.timestamp,tick.codalfa,prezzoRiferimento,prezzoApertura,price,tick.volume,(int) (tick.buy ? (float)price*tick.volume : -(float)price*tick.volume),vwap,standardDeviation,lastSpread,(int) (tick.buy ? ImpactBuy : ImpactSell));
 
 		trades.add(tr);
 
@@ -194,7 +197,7 @@ public class StockListener implements Observer {
 		int sommaBookImpactBuy=0;
 		int sommaBookImpactSell=0;
 		for (int k=0;k<trades.size();k++) {
-			sommaScarti+=Math.pow(((float) (trades.get(k).price-trades.get(k).vwap)/(trades.get(k).vwap)), 2);
+			sommaScarti+=Math.pow((Math.log(trades.get(k).price/prezzoRiferimento)), 2);
 			if ((trades.get(k).timestampLong >= tempoIniziale ) && (eNegoziazioneContinua(trades.get(k).timestamp))){
 				numberoftrades++;
 				sommaSpread+=trades.get(k).spread;
@@ -316,8 +319,15 @@ public class StockListener implements Observer {
 				lastBid = Float.parseFloat(parts[6]); //prezzo acquisto livello 1
 				lastAsk = Float.parseFloat(parts[21]);
 			}
+			else if (parts[1].compareTo("ANAG")==0) {
+				System.out.println("parts[6]: "+parts[6]);
+				String newpart6 = parts[6].replace(',', '.');
+				String newpart7 = parts[7].replace(',', '.');
+				prezzoRiferimento = Float.parseFloat(newpart6);
+				prezzoApertura = Float.parseFloat(newpart7);
+				}
 		}
-	}
+		}
 	
 	public static boolean eNegoziazioneContinua(Date timestamp) {
 		Calendar now = Calendar.getInstance();

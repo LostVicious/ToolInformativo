@@ -67,7 +67,7 @@ public class StockDatabaseMYSQL {
 	}
 
 	public void inserisciTrade(Trade t) {
-		doUpdate("insert into trades(codalfa,timestamp,price,volume,turnover,vwap,standarddeviation,spread,impact) values('"+t.codalfa+"','"+tsFormat.format(t.timestamp)+"',"+t.price+","+t.volume+","+t.turnover+","+t.vwap+","+t.standardDeviation+","+t.spread+","+t.impact+");");
+		doUpdate("insert into trades(codalfa,timestamp,prezzoriferimento,prezzoapertura,price,volume,turnover,vwap,standarddeviation,spread,impact) values('"+t.codalfa+"','"+tsFormat.format(t.timestamp)+"',"+t.prezzoRiferimento+","+t.prezzoApertura+","+t.price+","+t.volume+","+t.turnover+","+t.vwap+","+t.standardDeviation+","+t.spread+","+t.impact+");");
 }
 
 	

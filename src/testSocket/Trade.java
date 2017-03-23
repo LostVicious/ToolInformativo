@@ -8,6 +8,8 @@ public class Trade implements Serializable{
 		long timestampLong;
 		  Date timestamp;
 		  String codalfa;
+		  float prezzoRiferimento;
+		  float prezzoApertura;
 		  float price;
 		  int volume;
 		  int turnover;
@@ -15,6 +17,6 @@ public class Trade implements Serializable{
 		  double standardDeviation;
 		  int spread;
 		  int impact;
-		  public Trade(long tL, Date t, String cod, float p, int vol, int turn, float vw, double sd, int spr, int imp) {this.timestampLong=tL;this.timestamp=t;this.codalfa=cod;this.price=p;this.volume=vol;this.turnover=turn;this.vwap=vw;this.standardDeviation=sd;this.spread=spr;this.impact=imp;}
+		  public Trade(long tL, Date t, String cod, float pR,float pA, float p, int vol, int turn, float vw, double sd, int spr, int imp) {this.timestampLong=tL;this.timestamp=t;this.codalfa=cod;this.prezzoRiferimento=pR;this.prezzoApertura=pA;this.price=p;this.volume=vol;this.turnover=turn;this.vwap=vw;this.standardDeviation=sd;this.spread=spr;this.impact=imp;}
 	};
 		
