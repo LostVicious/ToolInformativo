@@ -128,21 +128,12 @@ public class StockListener implements Observer {
 		totalTurnover+=(float)price*tick.volume;
 		
 
-		System.out.println("lastAsk: "+lastAsk);
-		System.out.println("lastBid: "+lastBid);
 		
 		if (lastAsk!=0.0 && lastBid!=0.0) {
-//			System.out.println(GestioneOrdini.tickSizeFromPriceFloat(lastAsk));
-//			System.out.println((lastAsk-lastBid));
+
 			lastSpread=Math.round(((lastAsk-lastBid)/GestioneOrdini.tickSizeFromPriceFloat(lastAsk)));
-//			System.out.println(lastSpread);
 			ImpactBuy=Math.abs(Math.round((price-lastAsk)/GestioneOrdini.tickSizeFromPriceFloat(lastAsk)))+1;
 			ImpactSell=Math.abs(Math.round((lastBid-price)/GestioneOrdini.tickSizeFromPriceFloat(lastAsk)))+1;
-			System.out.println("price : "+price);
-//			System.out.println("Math.round: "+Math.round((price-lastAsk)/GestioneOrdini.tickSizeFromPriceFloat(lastAsk)));
-//			System.out.println("Math.Abs: "+Math.abs(Math.round((price-lastAsk)/GestioneOrdini.tickSizeFromPriceFloat(lastAsk))));
-//			System.out.println("ImpactBuy: "+ImpactBuy);
-//			System.out.println("ImpactSell: "+ImpactSell);
 		}
 		else {
 			lastSpread=1;
@@ -185,9 +176,7 @@ public class StockListener implements Observer {
 
 
 	public void calcolaIndicatori (Date timestamp) {
-//		System.out.println("timestamp calcolaIndicatori: "+timestamp);
 		timestampIndicatori=timestamp;
-//		System.out.println("timestampIndicatori è: "+timestampIndicatori);
 		long tempoIniziale = tick.timestamp.getTime() - 1000 * 60 * finestraTemporale; //30 minuti
 		int qTotaleTrades = 0, qCompratoTrades = 0;
 		numberoftrades = 0;
@@ -220,20 +209,9 @@ public class StockListener implements Observer {
 		try {
 		averageturnover = (int) qTotaleTrades/numberoftrades;
 		marketbuypercentage = (float)qCompratoTrades/qTotaleTrades;
-		System.out.println("sommaBookImpact: "+sommaBookImpact);
-		System.out.println("qTotaleTrades: "+qTotaleTrades);
 		bookImpact = (float) sommaBookImpact/qTotaleTrades;
-		System.out.println("bookImpact: "+bookImpact);
-
-		System.out.println("sommaBookImpactBuy: "+sommaBookImpactBuy);
-		System.out.println("qCompratoTrades: "+qCompratoTrades);
 		bookImpactBuy = (qCompratoTrades!=0 ? (float) sommaBookImpactBuy/qCompratoTrades : 1);
-		System.out.println("bookImpactBuy: "+bookImpactBuy);
-		System.out.println("sommaBookImpactSell: "+sommaBookImpactSell);
-		System.out.println("(qTotaleTrades-qCompratoTrades): "+(qTotaleTrades-qCompratoTrades));
-		bookImpactSell = (qTotaleTrades>qCompratoTrades ? (float) sommaBookImpactSell/(qTotaleTrades-qCompratoTrades) : 1);
-		System.out.println("bookImpactSell: "+bookImpactSell);}
-
+		bookImpactSell = (qTotaleTrades>qCompratoTrades ? (float) sommaBookImpactSell/(qTotaleTrades-qCompratoTrades) : 1);}
 		catch (Exception e) {
 			System.out.println("eccezione!");
 			System.out.println("numberoftrades: "+numberoftrades);
