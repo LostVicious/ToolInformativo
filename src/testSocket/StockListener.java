@@ -100,6 +100,7 @@ public class StockListener implements Observer {
 	Integer cumulatedVolume = 0;
 	Boolean marketOrder = false;
 	Float lastPrice = 0.0f; //prezzo del tick precedente
+	Float lastLastPrice = 0.0f; //prezzo del tick precedente al precedente
 	
 	public void processaTick(Tick tick) {
 		if (tick.volume<=0) return;
@@ -242,35 +243,55 @@ public class StockListener implements Observer {
 		if(s.compareTo("CARICAMENTO_TERMINATO")==0) return;
 		Boolean spezza = false;
 		String parts[] = s.split(";");
+		Long millis = Long.parseLong(parts[0]);
+		
+		
+		if (cumulatedVolume!=0 && millis-3>lastTickMillis) {
+			if (lastWasNeutral) {
+				//il tick e' avvenuto all'interno dello spread quindi non so se considerarlo vendita o acquisto
+				//lo considero vendita se il prezzo e' inferiore al prezzo precedente
+				if (lastPrice < lastLastPrice) lastWasBuy=false;  else  lastWasBuy=true;
+			}
+			Tick t = new Tick(codAlfa, new Date(lastTickMillis), lastPriceString, cumulatedVolume, lastWasBuy,marketOrder);
+			if (eNegoziazioneContinua(t.timestamp)) processaTick(t);
+			
+			cumulatedVolume = 0;
+			spezza = false;
+			marketOrder = false;
+		}
+		
 		if (parts[2].compareTo(codAlfa)==0 ) {
 			s="";
 			if (parts[1].compareTo("PRICE")==0) {
 					//stampa se e' passato piu' di 3 millisecondi, o se 'e passato da cquisto a vendita, altrimenti accorpora
-					Long millis = Long.parseLong(parts[0]);
-					if (Float.parseFloat(parts[4])>lastBid) {
-						if (Float.parseFloat(parts[4])>=lastAsk) {
-							//questo e' un acquisto ne siamo sicuri
-							if (!lastWasBuy) spezza=true;
+					if (cumulatedVolume!=0) {
+						if (Float.parseFloat(parts[4])>lastBid) {
+							if (Float.parseFloat(parts[4])>=lastAsk) {
+								//questo e' un acquisto ne siamo sicuri
+								if (!lastWasBuy && !lastWasNeutral) spezza=true;
+							}
+						} else {
+							//e' una vendita
+							if(lastWasBuy && !lastWasNeutral) spezza=true;
 						}
-					} else {
-						//e' una vendita
-						if(lastWasBuy) spezza=true;
-					}
-					if (millis-3>lastTickMillis || spezza) {
-						if (lastWasNeutral) {
-							//il tick e' avvenuto all'interno dello spread quindi non so se considerarlo vendita o acquisto
-							//lo considero vendita se il prezzo e' inferiore al prezzo precedente
-							if (Float.parseFloat(parts[4])<lastPrice) lastWasBuy=false;  else  lastWasBuy=true;
-						}
-						//System.out.println((lastWasBuy? "ACQUISTO" : "VENDITA") + "\t" + parts[4]);
-//						Tick t = new Tick(parts[2], new Date(lastTickMillis), lastPriceString, cumulatedVolume, lastWasBuy,marketOrder);
-						//Globals.db.insertTick(t);
-//						if (eNegoziazioneContinua(t.timestamp)) processaTick(t);
 						
-						cumulatedVolume = 0;
-						spezza = false;
-						marketOrder = false;
-						//System.out.println("AZZERO");
+						if (spezza) {
+							if (lastWasNeutral) {
+								//il tick e' avvenuto all'interno dello spread quindi non so se considerarlo vendita o acquisto
+								//lo considero vendita se il prezzo e' inferiore al prezzo precedente
+								if (Float.parseFloat(parts[4])<lastPrice) lastWasBuy=false;  else  lastWasBuy=true;
+							}
+							//System.out.println((lastWasBuy? "ACQUISTO" : "VENDITA") + "\t" + parts[4]);
+							Tick t = new Tick(parts[2], new Date(lastTickMillis), lastPriceString, cumulatedVolume, lastWasBuy,marketOrder);
+//							Globals.db.insertTick(t);
+							if (eNegoziazioneContinua(t.timestamp)) processaTick(t);
+							
+							cumulatedVolume = 0;
+							spezza = false;
+							marketOrder = false;
+							//System.out.println("AZZERO");
+						}
+						
 					}
 					lastWasNeutral = false;
 					if (Float.parseFloat(parts[4])>lastBid) {
@@ -287,11 +308,12 @@ public class StockListener implements Observer {
 					//System.out.println("Accumulo: "+Integer.parseInt(parts[5]));
 					
 					lastTickMillis = millis;
+					lastLastPrice = lastPrice;
 					lastPrice = Float.parseFloat(parts[4]);
 					lastPriceString = parts[4];
 					
-					Tick t = new Tick(parts[2], new Date(lastTickMillis), lastPriceString, cumulatedVolume, lastWasBuy,marketOrder);
-					if (eNegoziazioneContinua(t.timestamp)) processaTick(t);
+//					Tick t = new Tick(parts[2], new Date(lastTickMillis), lastPriceString, cumulatedVolume, lastWasBuy,marketOrder);
+//					if (eNegoziazioneContinua(t.timestamp)) processaTick(t);
 					
 			} else if (parts[1].compareTo("BOOK_5")==0) {
 				lastBid = Float.parseFloat(parts[6]); //prezzo acquisto livello 1
@@ -304,7 +326,7 @@ public class StockListener implements Observer {
 				prezzoRiferimento = Float.parseFloat(newpart6);
 				prezzoApertura = Float.parseFloat(newpart7);
 				}
-		}
+			}
 		}
 	
 	public static boolean eNegoziazioneContinua(Date timestamp) {
