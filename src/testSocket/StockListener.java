@@ -92,6 +92,8 @@ public class StockListener implements Observer {
 	
 	Float lastBid = 0f;
 	Float lastAsk = 0f;
+	Float lastBid0 = 0f;
+	Float lastAsk0 = 0f;
 	Float prezzoRiferimento = 0f;
 	Float prezzoApertura = 0f;
 	Boolean lastWasBuy = true, lastWasNeutral=false;
@@ -137,10 +139,10 @@ public class StockListener implements Observer {
 
 			lastSpread=Math.round(((lastAsk-lastBid)/GestioneOrdini.tickSizeFromPriceFloat(lastAsk)));
 			
-			if (price-lastAsk>=0) {
-				ImpactBuy=Math.abs((price-lastAsk)/GestioneOrdini.tickSizeFromPriceFloat(lastAsk))+1.0f;
-				System.out.println("(price-lastAsk): " +(price - lastAsk));
-				System.out.println("Math.abs: "+Math.abs((price - lastAsk) / GestioneOrdini.tickSizeFromPriceFloat(lastAsk)));
+			if (price-lastAsk>=0 && lastAsk0!=0.0 && lastBid0!=0.0) {
+				ImpactBuy=Math.abs((price-lastAsk0)/GestioneOrdini.tickSizeFromPriceFloat(lastAsk0))+1.0f;
+				System.out.println("(price-lastAsk): " +(price - lastAsk0));
+				System.out.println("Math.abs: "+Math.abs((price - lastAsk0) / GestioneOrdini.tickSizeFromPriceFloat(lastAsk0)));
 				System.out.println("ImpactBuy: " + ImpactBuy);
 			}
 			else {
@@ -149,10 +151,10 @@ public class StockListener implements Observer {
 				System.out.println("Math.abs: "+Math.abs((price - lastAsk) / GestioneOrdini.tickSizeFromPriceFloat(lastAsk)));
 				System.out.println("ImpactBuy: " + ImpactBuy);
 			}
-			if ((lastBid-price>=0)) {
-				ImpactSell=Math.abs((lastBid-price)/GestioneOrdini.tickSizeFromPriceFloat(lastAsk))+1.0f;
-				System.out.println("(lastBid-price): " + (lastBid - price));
-				System.out.println("Math.abs: "+ Math.abs((lastBid - price) / GestioneOrdini.tickSizeFromPriceFloat(lastAsk)));
+			if ((lastBid-price>=0 && lastAsk0!=0.0 && lastBid0!=0.0)) {
+				ImpactSell=Math.abs((lastBid0-price)/GestioneOrdini.tickSizeFromPriceFloat(lastAsk0))+1.0f;
+				System.out.println("(lastBid-price): " + (lastBid0 - price));
+				System.out.println("Math.abs: "+ Math.abs((lastBid0 - price) / GestioneOrdini.tickSizeFromPriceFloat(lastAsk0)));
 				System.out.println("ImpactSell: " + ImpactSell);
 			}
 			else {
@@ -359,7 +361,19 @@ public class StockListener implements Observer {
 			} else if (parts[1].compareTo("BOOK_5")==0) {
 				lastBid = Float.parseFloat(parts[6]); //prezzo acquisto livello 1
 				lastAsk = Float.parseFloat(parts[21]);
-			}
+				if (cumulatedVolume==0) {
+					lastBid0 = Float.parseFloat(parts[6]); //prezzo acquisto livello 1
+					lastAsk0 = Float.parseFloat(parts[21]);
+				}
+				}
+			else if (parts[1].compareTo("BIDASK")==0) {
+				lastBid = Float.parseFloat(parts[6]); //prezzo acquisto livello 1
+				lastAsk = Float.parseFloat(parts[9]);
+				if (cumulatedVolume==0) {
+					lastBid0 = Float.parseFloat(parts[6]); //prezzo acquisto livello 1
+					lastAsk0 = Float.parseFloat(parts[9]);
+				}
+				}
 			else if (parts[1].compareTo("ANAG")==0) {
 				System.out.println("parts[6]: "+parts[6]);
 				String newpart6 = parts[6].replace(',', '.');

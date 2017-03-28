@@ -47,7 +47,7 @@ public class TestSocket {
 //		gui.addTitoloInAscolto(new StockListener("ENEL",30,player, new ArrayList<Metodo>() ));
 //		gui.addTitoloInAscolto(new StockListener("ENI",30,player, new ArrayList<Metodo>() ));
 //		gui.addTitoloInAscolto(new StockListener("EXO",30,player, new ArrayList<Metodo>() ));
-// 		gui.addTitoloInAscolto(new StockListener("FCA",30,player, new ArrayList<Metodo>() ));
+ //		gui.addTitoloInAscolto(new StockListener("FCA",30,player, new ArrayList<Metodo>() ));
 //		gui.addTitoloInAscolto(new StockListener("RACE",30,player, new ArrayList<Metodo>() ));
 //		gui.addTitoloInAscolto(new StockListener("G",30,player, new ArrayList<Metodo>() ));
 //		gui.addTitoloInAscolto(new StockListener("ISP",30,player, new ArrayList<Metodo>() ));
