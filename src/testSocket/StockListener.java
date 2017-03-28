@@ -33,8 +33,8 @@ public class StockListener implements Observer {
 	float vwapRatio = 1.0f;
 	int DeltaT = 6*60*1000; //6 minuti;
 	int lastSpread=1;
-	int ImpactBuy=1;
-	int ImpactSell=1;
+	float ImpactBuy=1.0f;
+	float ImpactSell=1.0f;
 	Date timestampIndicatori;
 	int totalTurnover = 0;
 	int turnover = 0;
@@ -98,6 +98,7 @@ public class StockListener implements Observer {
 	Long lastTickMillis = Long.MAX_VALUE;
 	String lastPriceString = "0";
 	Integer cumulatedVolume = 0;
+	Float cumulatedTurnover = 0f;
 	Boolean marketOrder = false;
 	Float lastPrice = 0.0f; //prezzo del tick precedente
 	Float lastLastPrice = 0.0f; //prezzo del tick precedente al precedente
@@ -106,7 +107,7 @@ public class StockListener implements Observer {
 		if (tick.volume<=0) return;
 		
 		this.tick = tick;
-		float price = Float.parseFloat(tick.price);	
+		float price = tick.price;	
 		
 		db.insertTick(tick);
 		
@@ -128,20 +129,45 @@ public class StockListener implements Observer {
 
 		totalTurnover+=(float)price*tick.volume;
 		
-
+		System.out.println("lastAsk: " + lastAsk);
+		System.out.println("lastBid: " + lastBid);
+		System.out.println("price: " + price);
 		
 		if (lastAsk!=0.0 && lastBid!=0.0) {
 
 			lastSpread=Math.round(((lastAsk-lastBid)/GestioneOrdini.tickSizeFromPriceFloat(lastAsk)));
-			ImpactBuy=Math.abs(Math.round((price-lastAsk)/GestioneOrdini.tickSizeFromPriceFloat(lastAsk)))+1;
-			ImpactSell=Math.abs(Math.round((lastBid-price)/GestioneOrdini.tickSizeFromPriceFloat(lastAsk)))+1;
+			
+			if (price-lastAsk>=0) {
+				ImpactBuy=Math.abs((price-lastAsk)/GestioneOrdini.tickSizeFromPriceFloat(lastAsk))+1.0f;
+				System.out.println("(price-lastAsk): " +(price - lastAsk));
+				System.out.println("Math.abs: "+Math.abs((price - lastAsk) / GestioneOrdini.tickSizeFromPriceFloat(lastAsk)));
+				System.out.println("ImpactBuy: " + ImpactBuy);
+			}
+			else {
+				ImpactBuy=1;
+				System.out.println("(price-lastAsk): " +(price - lastAsk));
+				System.out.println("Math.abs: "+Math.abs((price - lastAsk) / GestioneOrdini.tickSizeFromPriceFloat(lastAsk)));
+				System.out.println("ImpactBuy: " + ImpactBuy);
+			}
+			if ((lastBid-price>=0)) {
+				ImpactSell=Math.abs((lastBid-price)/GestioneOrdini.tickSizeFromPriceFloat(lastAsk))+1.0f;
+				System.out.println("(lastBid-price): " + (lastBid - price));
+				System.out.println("Math.abs: "+ Math.abs((lastBid - price) / GestioneOrdini.tickSizeFromPriceFloat(lastAsk)));
+				System.out.println("ImpactSell: " + ImpactSell);
+			}
+			else {
+				ImpactSell=1;
+				System.out.println("(lastBid-price): " + (lastBid - price));
+				System.out.println("Math.abs: "+ Math.abs((lastBid - price) / GestioneOrdini.tickSizeFromPriceFloat(lastAsk)));
+				System.out.println("ImpactSell: " + ImpactSell);
+			}
 		}
 		else {
 			lastSpread=1;
 			ImpactBuy=1;
 			ImpactSell=1;}
 		
-		Trade tr = new Trade(tick.timestamp.getTime(),tick.timestamp,tick.codalfa,prezzoRiferimento,prezzoApertura,price,tick.volume,(int) (tick.buy ? (float)price*tick.volume : -(float)price*tick.volume),vwap,standardDeviation,lastSpread,(int) (tick.buy ? ImpactBuy : ImpactSell));
+		Trade tr = new Trade(tick.timestamp.getTime(),tick.timestamp,tick.codalfa,prezzoRiferimento,prezzoApertura,price,tick.volume,(int) (tick.buy ? (float)price*tick.volume : -(float)price*tick.volume),vwap,standardDeviation,lastSpread,(float) (tick.buy ? ImpactBuy : ImpactSell));
 
 		trades.add(tr);
 
@@ -183,9 +209,9 @@ public class StockListener implements Observer {
 		numberoftrades = 0;
 		double sommaScarti=0;
 		int sommaSpread=0;
-		int sommaBookImpact=0;
-		int sommaBookImpactBuy=0;
-		int sommaBookImpactSell=0;
+		float sommaBookImpact=0;
+		float sommaBookImpactBuy=0;
+		float sommaBookImpactSell=0;
 		for (int k=0;k<trades.size();k++) {
 			sommaScarti+=Math.pow((Math.log(trades.get(k).price/prezzoRiferimento)), 2);
 			if ((trades.get(k).timestampLong >= tempoIniziale ) && (eNegoziazioneContinua(trades.get(k).timestamp))){
@@ -236,6 +262,7 @@ public class StockListener implements Observer {
 	@Override
 	public void update(Observable arg0, Object arg1) {	
 		String s = (String)arg1;
+		System.out.println("s: " + s);
 		if(s.compareTo("CLEAR")==0) {
 			//this.clear();
 			return;
@@ -246,16 +273,22 @@ public class StockListener implements Observer {
 		Long millis = Long.parseLong(parts[0]);
 		
 		
+		System.out.println("cumulatedVolume: " +cumulatedVolume);
+		System.out.println("millis: " +millis);
+		
 		if (cumulatedVolume!=0 && millis-3>lastTickMillis) {
 			if (lastWasNeutral) {
 				//il tick e' avvenuto all'interno dello spread quindi non so se considerarlo vendita o acquisto
 				//lo considero vendita se il prezzo e' inferiore al prezzo precedente
 				if (lastPrice < lastLastPrice) lastWasBuy=false;  else  lastWasBuy=true;
 			}
-			Tick t = new Tick(codAlfa, new Date(lastTickMillis), lastPriceString, cumulatedVolume, lastWasBuy,marketOrder);
+			System.out.println("Tick1: cumulatedVolume: " +cumulatedVolume);
+			System.out.println("Tick1: millis: " +millis);
+			Tick t = new Tick(codAlfa, new Date(lastTickMillis), cumulatedTurnover/cumulatedVolume, lastPriceString, cumulatedVolume, lastWasBuy,marketOrder);
+			System.out.println("Tick 1");
 			if (eNegoziazioneContinua(t.timestamp)) processaTick(t);
-			
 			cumulatedVolume = 0;
+			cumulatedTurnover = 0f;
 			spezza = false;
 			marketOrder = false;
 		}
@@ -282,11 +315,16 @@ public class StockListener implements Observer {
 								if (Float.parseFloat(parts[4])<lastPrice) lastWasBuy=false;  else  lastWasBuy=true;
 							}
 							//System.out.println((lastWasBuy? "ACQUISTO" : "VENDITA") + "\t" + parts[4]);
-							Tick t = new Tick(parts[2], new Date(lastTickMillis), lastPriceString, cumulatedVolume, lastWasBuy,marketOrder);
+							System.out.println("Tick 2");
+							System.out.println("cumulatedTurnover 2: " + cumulatedTurnover);
+							System.out.println("cumulatedVolume 3: " + cumulatedVolume);
+							Tick t = new Tick(parts[2], new Date(lastTickMillis), cumulatedTurnover/cumulatedVolume, lastPriceString, cumulatedVolume, lastWasBuy,marketOrder);
+							System.out.println("cumulatedTurnover/cumulatedVolume: "+cumulatedTurnover/cumulatedVolume);
 //							Globals.db.insertTick(t);
 							if (eNegoziazioneContinua(t.timestamp)) processaTick(t);
 							
 							cumulatedVolume = 0;
+							cumulatedTurnover = 0f;
 							spezza = false;
 							marketOrder = false;
 							//System.out.println("AZZERO");
@@ -305,6 +343,9 @@ public class StockListener implements Observer {
 					
 					if (cumulatedVolume>0&&lastPrice!=Double.parseDouble(parts[4])) marketOrder=true;
 					cumulatedVolume += Integer.parseInt(parts[5]);
+					System.out.println("cumulatedVolume 1: " + cumulatedVolume);
+					cumulatedTurnover += Integer.parseInt(parts[5])*Float.parseFloat(parts[4]);
+					System.out.println("cumulatedTurnover 1: " + cumulatedTurnover);
 					//System.out.println("Accumulo: "+Integer.parseInt(parts[5]));
 					
 					lastTickMillis = millis;

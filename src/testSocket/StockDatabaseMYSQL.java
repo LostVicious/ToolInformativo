@@ -63,7 +63,7 @@ public class StockDatabaseMYSQL {
 
 	
 	public void insertTick(Tick tick) {
-			doUpdate("insert into toolinformativo(codalfa,timestamp,price,volume,buy,market) values('"+tick.codalfa+"','"+tsFormat.format(tick.timestamp)+"',"+tick.price+","+tick.volume+","+tick.buy+","+tick.market+");");
+			doUpdate("insert into toolinformativo(codalfa,timestamp,price,volume,buy,market) values('"+tick.codalfa+"','"+tsFormat.format(tick.timestamp)+"',"+tick.lastPrice+","+tick.volume+","+tick.buy+","+tick.market+");");
 	}
 
 	public void inserisciTrade(Trade t) {
