@@ -248,6 +248,7 @@ public class StockListener implements Observer {
 			e.printStackTrace();}
 		try {
 			standardDeviation = (trades.size()==1 ? Math.sqrt(sommaScarti/(trades.size())) : Math.sqrt(sommaScarti/(trades.size()-1)));
+			standardDeviation = standardDeviation*Math.sqrt(252.0);
 			bidAskSpread = (float) sommaSpread/numberoftrades;}
 		catch (Exception exc){
 			System.out.println("eccezione!");
