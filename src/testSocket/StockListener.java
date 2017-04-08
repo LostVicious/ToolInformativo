@@ -55,7 +55,7 @@ public class StockListener implements Observer {
 	StockDatabaseMYSQL db = new StockDatabaseMYSQL();
 	DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-	
+
 	
 	ArrayList<Trade> trades = new ArrayList<Trade>();
 
