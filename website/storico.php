@@ -37,7 +37,7 @@ if ($result->num_rows > 0) {
      while($row = $result->fetch_assoc()) {
          echo "<tr>";
          stampaCella($row["codalfa"]);
-         stampaCella($row["timestamp"]);
+         stampaCella($row["timewindow"]);
          foreach (array("totalturnover", "turnover30", "numberoftrades30", "averageturnover30", "marketorderdelta30", "marketbuypercentage30", "standarddeviation", "spread30", "bookimpact30", "bookimpactbuy30", "bookimpactsell30") as $indicatore) {
              $valore = $row[$indicatore];
              if (in_array($indicatore, array("totalturnover", "turnover30", "averageturnover30", "marketorderdelta30"))) {
