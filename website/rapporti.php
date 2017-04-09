@@ -27,20 +27,25 @@ if ($conn->connect_error) {
 echo "<table class=\"tg\"><tr><th>Codalfa</th><th>Tempo</th><th>Controvalore Totale</th><th>Controvalore 30</th><th>Numero Trade 30</th><th>Controvalore medio 30</th><th>Market Delta 30</th><th>Market Buy Percentage 30</th><th>Volatilità</th><th>Spread 30</th><th>Impatto Book Medio</th><th>Impatto Buy</th><th>Impatto Sell</th></tr>";
     
 #$sql = "SELECT * FROM indicatoridaily WHERE id IN (SELECT Max( id ) FROM indicatoridaily GROUP BY codalfa ) order by codalfa";
-#$sql = "SELECT * FROM indicatoristorici AS i INNER JOIN (SELECT Max( id ) AS id FROM indicatoridaily GROUP BY codalfa) AS t ON t.id = i.id;";
-$sql = "SELECT * FROM indicatoristorici WHERE timewindow = (SELECT MAX(timewindow) from indicatoristorici WHERE timewindow<= (SELECT TIME(MAX(timestamp)) FROM indicatoridaily) );";
+$sql = "SELECT * FROM indicatoridaily AS i INNER JOIN (SELECT Max( id ) AS id FROM indicatoridaily GROUP BY codalfa) AS t ON t.id = i.id;";
 $result = $conn->query($sql);
 
 if ($result->num_rows > 0) {
 
      // output data of each row
      while($row = $result->fetch_assoc()) {
+     	
+     	$sql = "SELECT * FROM indicatoristorici WHERE codalfa='".$row["codalfa"]."' AND timewindow < TIME('".$row["timestamp"]."') ORDER BY timewindow DESC LIMIT 1";
+     	$result2 = $conn->query($sql);
+     	$row2 = $result2->fetch_assoc();
+     	//print_r($row2);
+     	
          echo "<tr>";
          stampaCella($row["codalfa"]);
-         stampaCella($row["timewindow"]);
+         stampaCella($row["timestamp"]);
          foreach (array("totalturnover", "turnover30", "numberoftrades30", "averageturnover30", "marketorderdelta30", "marketbuypercentage30", "standarddeviation", "spread30", "bookimpact30", "bookimpactbuy30", "bookimpactsell30") as $indicatore) {
-             $valore = $row[$indicatore];
-             if (in_array($indicatore, array("totalturnover", "turnover30", "averageturnover30", "marketorderdelta30"))) {
+         	$valore = ($row[$indicatore]-$row2[$indicatore])/$row2[$indicatore];
+             /*if (in_array($indicatore, array("totalturnover", "turnover30", "averageturnover30", "marketorderdelta30"))) {
                  $valore = number_format($valore) . " €"; 
              }
              else if ($indicatore == "marketbuypercentage30") {
@@ -48,8 +53,8 @@ if ($result->num_rows > 0) {
              }
              else if ($indicatore == "standarddeviation") {
                  $valore = number_format($valore*100, 2) . " %"; 
-             }
-             $link = creaLink($row["codalfa"], $indicatore, $valore );
+             }*/
+             $link = creaLink($row["codalfa"], $indicatore, number_format($valore*100,2).' %' );
              stampaCella( $link );
          }
          echo "<tr/>";
@@ -64,7 +69,7 @@ $conn->close();
     
 
 function creaLink($codalfa, $indicatore, $dato) {
-    return "<a href=\"#\" onClick=\"window.open('chartstorico.php?codalfa=".$codalfa."&indicatore=".$indicatore."','".$codalfa.$indicatore."','resizable,width=800,height=600,left=300,top=150'); return false;\">".$dato."</a>";
+    return "<a href=\"#\" onClick=\"window.open('chart.php?codalfa=".$codalfa."&indicatore=".$indicatore."','".$codalfa.$indicatore."','resizable,width=800,height=600,left=300,top=150'); return false;\">".$dato."</a>";
 }
     
 function stampaCella($dato) {
