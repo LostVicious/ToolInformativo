@@ -2,12 +2,19 @@
 <html>
 <head>
 <style type="text/css">
-.tg  {border-collapse:collapse;border-spacing:0;border-color:#999;margin:0px auto;}
-.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 14px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#999;color:blue;background-color:white;}
-.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 14px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#999;color:#fff;background-color:lightskyblue;}
+.tg  {border-collapse:collapse;border-spacing:0;border-color:#6E6E6E;margin:0px auto;}
+.tg td{font-family:Arial, sans-serif;font-size:15.5px;padding:11px 15px;border-style:outset;border-width:1px;overflow:hidden;word-break:normal;border-color:#948e8e;color:#8c7b7b;background-color:#222;}
+.tg th{font-family:Arial, sans-serif;font-size:15.5px;font-weight:normal;padding:10px 14px;border-style:outset;border-width:1px;overflow:hidden;word-break:normal;border-color:#6E6E6E;color:#afa6a6;background-color:#0e3252;}
 .tg .tg-yw4l{vertical-align:top}
-body {background-color: white;}
-a {color:blue;}
+body {background-color: #444;}
+a {color:#ada0a0;
+text-decoration: none;}
+.green {
+    color: #12a012;
+}   
+.red {
+    color: #da2929;
+}
 </style>
 <body>
 <?php
@@ -39,17 +46,27 @@ if ($result->num_rows > 0) {
          stampaCella($row["codalfa"]);
          stampaCella($row["timewindow"]);
          foreach (array("totalturnover", "turnover30", "numberoftrades30", "averageturnover30", "marketorderdelta30", "marketbuypercentage30", "standarddeviation", "spread30", "bookimpact30", "bookimpactbuy30", "bookimpactsell30") as $indicatore) {
-             $valore = $row[$indicatore];
-             if (in_array($indicatore, array("totalturnover", "turnover30", "averageturnover30", "marketorderdelta30"))) {
+$valore = $row[$indicatore];
+             if (in_array($indicatore, array("totalturnover", "turnover30", "averageturnover30"))) {
                  $valore = number_format($valore) . " €"; 
+                 $link = creaLink($row["codalfa"], $indicatore, $valore );
+             }
+             else if ($indicatore == "marketorderdelta30") {
+                 $valore = number_format($valore) . " €"; 
+                 if ($valore>=0){$link = creaLink($row["codalfa"], $indicatore, $valore, "green" );}
+                else{$link = creaLink($row["codalfa"], $indicatore, $valore, "red" );}
+                 
              }
              else if ($indicatore == "marketbuypercentage30") {
                  $valore = number_format($valore*100, 2) . " %"; 
+                 if ($valore>=50){$link = creaLink($row["codalfa"], $indicatore, $valore, "green" );}
+                else{$link = creaLink($row["codalfa"], $indicatore, $valore, "red" );}
              }
              else if ($indicatore == "standarddeviation") {
                  $valore = number_format($valore*100, 2) . " %"; 
+                 $link = creaLink($row["codalfa"], $indicatore, $valore );
              }
-             $link = creaLink($row["codalfa"], $indicatore, $valore );
+             else{$link = creaLink($row["codalfa"], $indicatore, $valore );}
              stampaCella( $link );
          }
          echo "<tr/>";
@@ -63,8 +80,8 @@ if ($result->num_rows > 0) {
 $conn->close();
     
 
-function creaLink($codalfa, $indicatore, $dato) {
-    return "<a href=\"#\" onClick=\"window.open('chartstorico.php?codalfa=".$codalfa."&indicatore=".$indicatore."','".$codalfa.$indicatore."','resizable,width=800,height=600,left=300,top=150'); return false;\">".$dato."</a>";
+function creaLink($codalfa, $indicatore, $dato, $class="") {
+    return "<a href=\"#\" class=\"".$class."\" onClick=\"window.open('chartstorico.php?codalfa=".$codalfa."&indicatore=".$indicatore."','".$codalfa.$indicatore."','resizable,width=800,height=600,left=300,top=150'); return false;\">".$dato."</a>";
 }
     
 function stampaCella($dato) {
