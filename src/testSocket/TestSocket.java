@@ -90,7 +90,7 @@ public class TestSocket {
 			if ( SCRIVI_FILE_DATI ) ds.writeLine(sentence);
 			
 			outToServer.writeBytes("SUB SO\n");
-	//		outToServer.writeBytes("SUB A2A,ANIM,AZM,BMED,BAMI,BPE,BZU,CNHI,ENAV,ENEL,ENI,EXO,FCA,G,ISP,LDO,LUX,MB,MONC,MS,PRY,PST,SFER,SPM,SRG,STM,TEN,TIT,TOD,TRN,RACE,UBI,UNI,UCG\n");
+//			outToServer.writeBytes("SUB A2A,ANIM,AZM,BMED,BAMI,BPE,BZU,CNHI,ENAV,ENEL,ENI,EXO,FCA,G,ISP,LDO,LUX,MB,MONC,MS,PRY,PST,SFER,SPM,SRG,STM,TEN,TIT,TOD,TRN,RACE,UBI,UNI,UCG\n");
 			if ( SCRIVI_FILE_DATI ) ds.writeLine(sentence);
 			
 			Long ultimoDatoBook = System.currentTimeMillis();
