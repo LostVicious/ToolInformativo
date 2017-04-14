@@ -40,7 +40,7 @@ var chart = AmCharts.makeChart("chartdiv", {
     "marginLeft": 40,
     "autoMarginOffset": 20,
     "mouseWheelZoomEnabled":true,
-    "dataDateFormat": "YYYY-MM-DD HH:NN:SS",
+    "dataDateFormat": "HH:NN:SS",
     "valueAxes": [{
         "id": "v1",
         "axisAlpha": 0,
@@ -143,6 +143,7 @@ var chart = AmCharts.makeChart("chartdiv", {
 
         if ($result->num_rows > 0) {
             while($row = $result->fetch_assoc()) {
+                #echo '{"date": date("Y-m-d") - "' . $row['timewindow'] . '","value": ' . $row[$indicatore] . "},\n";
                 echo '{"date": "' . $row['timewindow'] . '","value": ' . $row[$indicatore] . "},\n";
             }
         } else {

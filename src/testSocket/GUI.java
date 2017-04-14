@@ -50,7 +50,7 @@ public class GUI implements Observer {
 	javax.swing.text.AttributeSet green;
 	
 	long lastUIupdate = 0;
-	boolean showGUI = true;
+	boolean showGUI = false;
 	
 	ArrayList<StockListener> titoliInAscolto = new ArrayList<StockListener>();
 	
