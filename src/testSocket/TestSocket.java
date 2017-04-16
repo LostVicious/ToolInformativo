@@ -139,6 +139,17 @@ public class TestSocket {
 		gui.addTitoloInAscolto(new StockListener("VAS",30,player, new ArrayList<Metodo>() ));
 		gui.addTitoloInAscolto(new StockListener("ZV",30,player, new ArrayList<Metodo>() ));
 		
+		// Futures
+		
+//		gui.addTitoloInAscolto(new StockListener("FIB=",30,player, new ArrayList<Metodo>() ));
+//		gui.addTitoloInAscolto(new StockListener("EU.DX=",30,player, new ArrayList<Metodo>() ));
+//		gui.addTitoloInAscolto(new StockListener("EU.DJ50=",30,player, new ArrayList<Metodo>() ));
+//		gui.addTitoloInAscolto(new StockListener("CM.ES=",30,player, new ArrayList<Metodo>() ));
+//		gui.addTitoloInAscolto(new StockListener("EU.CA=",30,player, new ArrayList<Metodo>() ));
+//		gui.addTitoloInAscolto(new StockListener("EU.EB=",30,player, new ArrayList<Metodo>() ));
+//		gui.addTitoloInAscolto(new StockListener("CM.ES=",30,player, new ArrayList<Metodo>() ));
+//		gui.addTitoloInAscolto(new StockListener("EU.FVS=",30,player, new ArrayList<Metodo>() ));
+		
 //    	gui.addTitoloInAscolto(new StockListener("SO",30,player, new ArrayList<Metodo>() ));
 //		gui.addTitoloInAscolto(new StockListener("EM",30,player, new ArrayList<Metodo>() ));
 //		gui.addTitoloInAscolto(new StockListener("LX.EURUSD",30,player, new ArrayList<Metodo>() ));

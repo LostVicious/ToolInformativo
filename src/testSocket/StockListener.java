@@ -67,24 +67,24 @@ public class StockListener implements Observer {
 		this.player = player;
 		this.metodi = metodi;
 		player.addObserver(this);
-		this.file = new File(dateFormat.format(new Date(System.currentTimeMillis()))+"-"+codalfa+".tmp");
-		try {
-			System.out.println("isFile: "+file.isFile());
-			if (!file.isFile()){
-				file.createNewFile();
-				System.out.println("File is created!");}
-			else{
-	        System.out.println("File already exists.");
-//	        FileInputStream fis = new FileInputStream(file);
-//	        ObjectInputStream ois = new ObjectInputStream(fis);
-////	        System.out.println(ois.readObject());
-////	        this.trades = (ArrayList<Trade>) ois.readObject();
-//	        ois.close();
-			}
-			}
-		catch (IOException  e) {
-		      e.printStackTrace();
-		}
+//		this.file = new File(dateFormat.format(new Date(System.currentTimeMillis()))+"-"+codalfa+".tmp");
+//		try {
+//			System.out.println("isFile: "+file.isFile());
+//			if (!file.isFile()){
+//				file.createNewFile();
+//				System.out.println("File is created!");}
+//			else{
+//	        System.out.println("File already exists.");
+////	        FileInputStream fis = new FileInputStream(file);
+////	        ObjectInputStream ois = new ObjectInputStream(fis);
+//////	        System.out.println(ois.readObject());
+//////	        this.trades = (ArrayList<Trade>) ois.readObject();
+////	        ois.close();
+//			}
+//			}
+//		catch (IOException  e) {
+//		      e.printStackTrace();
+//		}
 	}
 
 
