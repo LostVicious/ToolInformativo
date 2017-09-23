@@ -53,6 +53,7 @@ public class TestSocket {
 		gui.addTitoloInAscolto(new StockListener("RACE",30,player, new ArrayList<Metodo>() ));
 		gui.addTitoloInAscolto(new StockListener("FBK",30,player, new ArrayList<Metodo>() ));
 		gui.addTitoloInAscolto(new StockListener("G",30,player, new ArrayList<Metodo>() ));
+		gui.addTitoloInAscolto(new StockListener("IG",30,player, new ArrayList<Metodo>() ));
 		gui.addTitoloInAscolto(new StockListener("ISP",30,player, new ArrayList<Metodo>() ));
 		gui.addTitoloInAscolto(new StockListener("IT",30,player, new ArrayList<Metodo>() ));
 		gui.addTitoloInAscolto(new StockListener("LDO",30,player, new ArrayList<Metodo>() ));
@@ -132,7 +133,10 @@ public class TestSocket {
 		gui.addTitoloInAscolto(new StockListener("SAL",30,player, new ArrayList<Metodo>() ));
 		gui.addTitoloInAscolto(new StockListener("SRS",30,player, new ArrayList<Metodo>() ));
 		gui.addTitoloInAscolto(new StockListener("SAVE",30,player, new ArrayList<Metodo>() ));
+		gui.addTitoloInAscolto(new StockListener("SG",30,player, new ArrayList<Metodo>() ));
 		gui.addTitoloInAscolto(new StockListener("SIS",30,player, new ArrayList<Metodo>() ));
+		gui.addTitoloInAscolto(new StockListener("SO",30,player, new ArrayList<Metodo>() ));
+		gui.addTitoloInAscolto(new StockListener("TFI",30,player, new ArrayList<Metodo>() ));
 		gui.addTitoloInAscolto(new StockListener("TIP",30,player, new ArrayList<Metodo>() ));
 		gui.addTitoloInAscolto(new StockListener("TGYM",30,player, new ArrayList<Metodo>() ));
 		gui.addTitoloInAscolto(new StockListener("TOD",30,player, new ArrayList<Metodo>() ));
@@ -169,7 +173,7 @@ public class TestSocket {
 			
 
 //			outToServer.writeBytes("SUB SO\n");
-			outToServer.writeBytes("SUB A2A,ATL,ANIM,AZM,BGN,BMED,BAMI,BPE,BRE,BZU,CPR,CNHI,ENEL,ENI,IT,EXO,FCA,FBK,G,ISP,LDO,LUX,MB,MONC,MS,PRY,PST,REC,SFER,SPM,SRG,STM,TEN,TIT,TRN,RACE,UBI,UNI,US,UCG,ACE,ADB,AMP,STS,ASC,AST,AT,AGL,IF,BPSO,BNS,BSS,BC,CAI,CASS,CEM,CERV,CIR,CE,CVAL,DAN,DAL,DLG,DIA,EIT,ELN,ENAV,ERG,PRT,FILA,FCT,GEO,HER,IGD,IMA,IP,INW,IRE,ITM,JUVE,MT,MARR,MOL,OVS,PLT,PIA,RWAY,RCS,REY,SFL,SAL,SRS,SAVE,SIS,TIP,TGYM,TOD,VAS,ZV\n");
+			outToServer.writeBytes("SUB A2A,ATL,ANIM,AZM,BGN,BMED,BAMI,BPE,BRE,BZU,CPR,CNHI,ENEL,ENI,IT,IG,EXO,FCA,FBK,G,ISP,LDO,LUX,MB,MONC,MS,PRY,PST,REC,SFER,SPM,SRG,STM,TEN,TIT,TRN,RACE,UBI,UNI,US,UCG,YNAP,ACE,ADB,AMP,STS,ASC,AST,AT,AGL,IF,BPSO,BNS,BSS,BC,CAI,CASS,CEM,CERV,CIR,CE,CVAL,DAN,DAL,DLG,DIA,EIT,ELN,ENAV,ERG,PRT,FILA,FCT,GEO,HER,IGD,IMA,IP,INW,IRE,ITM,JUVE,MT,MARR,MOL,OVS,PLT,PIA,RWAY,RCS,REY,SFL,SG,SO,SAL,SRS,SAVE,SIS,TFI,TIP,TGYM,TOD,VAS,ZV\n");
 
 			if ( SCRIVI_FILE_DATI ) ds.writeLine(sentence);
 			
@@ -199,7 +203,7 @@ public class TestSocket {
 						inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));   
 						sentence = inFromServer.readLine();   						
 						if ( SCRIVI_FILE_DATI ) ds.writeLine(sentence);
-						outToServer.writeBytes("SUB A2A,ATL,ANIM,AZM,BGN,BMED,BAMI,BPE,BRE,BZU,CPR,CNHI,ENEL,ENI,IT,EXO,FCA,FBK,G,ISP,LDO,LUX,MB,MONC,MS,PRY,PST,REC,SFER,SPM,SRG,STM,TEN,TIT,TRN,RACE,UBI,UNI,US,UCG,ACE,ADB,AMP,STS,ASC,AST,AT,AGL,IF,BPSO,BNS,BSS,BC,CAI,CASS,CEM,CERV,CIR,CE,CVAL,DAN,DAL,DLG,DIA,EIT,ELN,ENAV,ERG,PRT,FILA,FCT,GEO,HER,IGD,IMA,IP,INW,IRE,ITM,JUVE,MT,MARR,MOL,OVS,PLT,PIA,RWAY,RCS,REY,SFL,SAL,SRS,SAVE,SIS,TIP,TGYM,TOD,VAS,ZV\n");
+						outToServer.writeBytes("SUB A2A,ATL,ANIM,AZM,BGN,BMED,BAMI,BPE,BRE,BZU,CPR,CNHI,ENEL,ENI,IG,IT,EXO,FCA,FBK,G,ISP,LDO,LUX,MB,MONC,MS,PRY,PST,REC,SFER,SPM,SRG,STM,TEN,TIT,TRN,RACE,UBI,UNI,US,UCG,YNAP,ACE,ADB,AMP,STS,ASC,AST,AT,AGL,IF,BPSO,BNS,BSS,BC,CAI,CASS,CEM,CERV,CIR,CE,CVAL,DAN,DAL,DLG,DIA,EIT,ELN,ENAV,ERG,PRT,FILA,FCT,GEO,HER,IGD,IMA,IP,INW,IRE,ITM,JUVE,MT,MARR,MOL,OVS,PLT,PIA,RWAY,RCS,REY,SFL,SG,SO,SAL,SRS,SAVE,SIS,TFI,TIP,TGYM,TOD,VAS,ZV\n");
 //						outToServer.writeBytes("SUB GE\n");
 						if ( SCRIVI_FILE_DATI ) ds.writeLine(sentence);
 						ultimoDatoBook = System.currentTimeMillis();  
